@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { FileText, Copy, Trash2, CheckCircle, Download, Printer } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
+import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import PacienteSelector from "../components/exams/PacienteSelector";
 import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
@@ -15,24 +16,8 @@ export default function SolicitacaoExames() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
 
-  // Dados das seções de exames
+  // Dados das seções de exames (seção metabólica tratada separadamente com painel 3 colunas)
   const examSections = [
-    {
-      id: "metabolica",
-      title: "1. Avaliação Metabólica e Cardiovascular (Sangue)",
-      exams: [
-        "Glicemia em Jejum",
-        "Hemoglobina Glicada (HbA1c)",
-        "Colesterol Total e Frações (LDL, HDL, VLDL)",
-        "Triglicerídeos",
-        "Ácido Úrico",
-        "Insulina de Jejum",
-        "Peptídeo C",
-        "Apolipoproteína A1 e B (Apo A1/B)",
-        "Homocisteína",
-        "Lipoproteína (a) [Lp(a)]"
-      ]
-    },
     {
       id: "renal_hepatica",
       title: "2. Função Renal, Hepática e Pancreática (Sangue)",
@@ -334,6 +319,17 @@ export default function SolicitacaoExames() {
           </h2>
 
           <div className="space-y-6">
+            {/* Seção Metabólica em 3 colunas */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-700 mb-3">
+                1. Avaliação Metabólica e Cardiovascular (Sangue)
+              </h3>
+              <ExamesMetabolicosPanel
+                selectedExams={selectedExams["metabolica"] || {}}
+                onExamChange={handleExamChange}
+              />
+            </div>
+
             {examSections.map(section => (
               <ExamSection
                 key={section.id}
