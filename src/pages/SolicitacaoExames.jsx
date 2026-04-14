@@ -7,6 +7,7 @@ import ExamSection from "../components/exams/ExamSection";
 import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
 import ExamesGeralHormonalPanel from "../components/exams/ExamesGeralHormonalPanel";
+import ExamesUrinaFezesPanel from "../components/exams/ExamesUrinaFezesPanel";
 import PacienteSelector from "../components/exams/PacienteSelector";
 import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
@@ -18,19 +19,8 @@ export default function SolicitacaoExames() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
 
-  // Dados das seções de exames (seções metabólica, renal/hepática e geral/hormonal tratadas separadamente)
+  // Dados das seções de exames (seções 1-4 tratadas como painéis separados)
   const examSections = [
-    {
-      id: "urina_fezes",
-      title: "4. Urina e Fezes",
-      exams: [
-        "Sumário de Urina (Urina Tipo I)",
-        "Parasitológico de Fezes (Três amostras, se indicado)",
-        "Pesquisa de Sangue Oculto nas Fezes (PSOF)",
-        "Microalbuminúria/Relação Albumina/Creatinina (Urina)",
-        "Urocultura com Antibiograma"
-      ]
-    },
     {
       id: "pre_operatorios",
       title: "5. Pré-Operatórios (Laboratoriais)",
@@ -322,6 +312,17 @@ export default function SolicitacaoExames() {
               </h3>
               <ExamesGeralHormonalPanel
                 selectedExams={selectedExams["geral_hormonal"] || {}}
+                onExamChange={handleExamChange}
+              />
+            </div>
+
+            {/* Seção Urina e Fezes em 3 colunas */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-700 mb-3">
+                4. Urina e Fezes
+              </h3>
+              <ExamesUrinaFezesPanel
+                selectedExams={selectedExams["urina_fezes"] || {}}
                 onExamChange={handleExamChange}
               />
             </div>
