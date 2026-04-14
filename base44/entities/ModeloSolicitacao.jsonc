@@ -1,0 +1,22 @@
+{
+  "name": "ModeloSolicitacao",
+  "type": "object",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome do modelo (ex: Check-up Geral)"
+    },
+    "descricao": {
+      "type": "string",
+      "description": "Descri\u00e7\u00e3o opcional do modelo"
+    },
+    "exames": {
+      "type": "object",
+      "description": "Mapa de exames selecionados por se\u00e7\u00e3o (selectedExams)"
+    }
+  },
+  "required": [
+    "nome",
+    "exames"
+  ]
+}

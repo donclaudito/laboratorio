@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileText, Copy, Trash2, CheckCircle, Download, Printer } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
 import PacienteSelector from "../components/exams/PacienteSelector";
+import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
 
 export default function SolicitacaoExames() {
@@ -321,6 +322,11 @@ export default function SolicitacaoExames() {
           <PacienteSelector
             pacienteSelecionado={pacienteSelecionado}
             onSelecionarPaciente={setPacienteSelecionado}
+          />
+
+          <ModelosSelector
+            selectedExams={selectedExams}
+            onCarregarModelo={setSelectedExams}
           />
 
           <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
