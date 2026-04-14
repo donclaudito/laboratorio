@@ -2,15 +2,17 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Copy, Trash2, CheckCircle, Download } from "lucide-react";
+import { FileText, Copy, Trash2, CheckCircle, Download, Printer } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
-import { gerarPDF } from "../components/exams/PdfGenerator";
+import PacienteSelector from "../components/exams/PacienteSelector";
+import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
 
 export default function SolicitacaoExames() {
   const [selectedExams, setSelectedExams] = useState({});
   const [resultado, setResultado] = useState("");
   const [showResult, setShowResult] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
+  const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
 
   // Dados das seções de exames
   const examSections = [
@@ -240,7 +242,8 @@ export default function SolicitacaoExames() {
 
   const gerarSolicitacao = () => {
     const hoje = new Date().toLocaleDateString('pt-BR');
-    let resultado = `# SOLICITAÇÃO DE EXAMES\n\n**Médico Solicitante:** Dr Claudio M Orenstein CREMSP 58120\n**Data da Solicitação:** ${hoje}\n\n---\n`;
+    let pacienteInfo = pacienteSelecionado ? `\n**Paciente:** ${pacienteSelecionado.nome}${pacienteSelecionado.idade ? ` | ${pacienteSelecionado.idade} anos` : ""}${pacienteSelecionado.paciente_id ? ` | ID: ${pacienteSelecionado.paciente_id}` : ""}` : "";
+    let resultado = `# SOLICITAÇÃO DE EXAMES\n\n**Médico Solicitante:** Dr Claudio M Orenstein CREMSP 58120\n**Data da Solicitação:** ${hoje}${pacienteInfo}\n\n---\n`;
     
     let examesSelecionados = 0;
     let currentSection = "";
@@ -315,6 +318,11 @@ export default function SolicitacaoExames() {
 
         {/* Formulário */}
         <Card className="shadow-xl rounded-t-none rounded-b-2xl p-6 sm:p-8">
+          <PacienteSelector
+            pacienteSelecionado={pacienteSelecionado}
+            onSelecionarPaciente={setPacienteSelecionado}
+          />
+
           <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
             Selecione os Exames
           </h2>
@@ -384,11 +392,18 @@ export default function SolicitacaoExames() {
                   )}
                 </Button>
                 <Button
-                  onClick={() => gerarPDF(resultado)}
+                  onClick={() => gerarPDF(resultado, pacienteSelecionado)}
                   className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 font-bold shadow-md transition-all duration-300 hover:scale-105"
                 >
                   <Download className="w-5 h-5 mr-2" />
                   Exportar PDF
+                </Button>
+                <Button
+                  onClick={() => imprimirPDF(resultado, pacienteSelecionado)}
+                  className="bg-gray-700 hover:bg-gray-800 text-white px-6 py-3 font-bold shadow-md transition-all duration-300 hover:scale-105"
+                >
+                  <Printer className="w-5 h-5 mr-2" />
+                  Imprimir
                 </Button>
               </div>
             </div>

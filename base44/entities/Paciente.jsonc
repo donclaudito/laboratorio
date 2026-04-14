@@ -1,0 +1,21 @@
+{
+  "name": "Paciente",
+  "type": "object",
+  "properties": {
+    "nome": {
+      "type": "string",
+      "description": "Nome completo do paciente"
+    },
+    "idade": {
+      "type": "number",
+      "description": "Idade do paciente"
+    },
+    "paciente_id": {
+      "type": "string",
+      "description": "ID ou prontu\u00e1rio do paciente"
+    }
+  },
+  "required": [
+    "nome"
+  ]
+}

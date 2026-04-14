@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 
-export function gerarPDF(resultado) {
+export function gerarPDF(resultado, paciente = null) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -9,10 +9,11 @@ export function gerarPDF(resultado) {
   const usableWidth = pageWidth - marginLeft - marginRight;
 
   const hoje = new Date().toLocaleDateString("pt-BR");
+  const headerHeight = paciente ? 36 : 28;
 
   // ─── CABEÇALHO ───────────────────────────────────────────────────────────
   doc.setFillColor(16, 185, 129); // emerald-500
-  doc.rect(0, 0, pageWidth, 28, "F");
+  doc.rect(0, 0, pageWidth, headerHeight, "F");
 
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
@@ -24,13 +25,22 @@ export function gerarPDF(resultado) {
   doc.text("Dr. Claudio M Orenstein  |  CRM-SP 58120", pageWidth / 2, 18, { align: "center" });
   doc.text(`Data: ${hoje}`, pageWidth / 2, 23, { align: "center" });
 
+  if (paciente) {
+    let pacienteInfo = `Paciente: ${paciente.nome}`;
+    if (paciente.idade) pacienteInfo += `  |  Idade: ${paciente.idade} anos`;
+    if (paciente.paciente_id) pacienteInfo += `  |  ID: ${paciente.paciente_id}`;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.text(pacienteInfo, pageWidth / 2, 30, { align: "center" });
+  }
+
   // ─── LINHA SEPARADORA ────────────────────────────────────────────────────
   doc.setDrawColor(16, 185, 129);
   doc.setLineWidth(0.5);
-  doc.line(marginLeft, 32, pageWidth - marginRight, 32);
+  doc.line(marginLeft, headerHeight + 4, pageWidth - marginRight, headerHeight + 4);
 
   // ─── CONTEÚDO ────────────────────────────────────────────────────────────
-  let y = 38;
+  let y = headerHeight + 10;
   const lineHeight = 6;
   const footerHeight = 20;
 
@@ -48,8 +58,8 @@ export function gerarPDF(resultado) {
     if (y > pageHeight - footerHeight - 10) {
       addFooter(doc, pageWidth, pageHeight);
       doc.addPage();
-      addHeader(doc, pageWidth, hoje);
-      y = 38;
+      addHeader(doc, pageWidth, hoje, paciente);
+      y = (paciente ? 36 : 28) + 10;
     }
 
     if (line.startsWith("### ")) {
@@ -132,9 +142,116 @@ export function gerarPDF(resultado) {
   doc.save(`solicitacao-exames-${hoje.replace(/\//g, "-")}.pdf`);
 }
 
-function addHeader(doc, pageWidth, hoje) {
+export function imprimirPDF(resultado, paciente = null) {
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  // Reutiliza toda a lógica de geração mas abre janela de impressão
+  const blob = gerarPDFBlob(resultado, paciente, doc);
+  const url = URL.createObjectURL(blob);
+  const iframe = document.createElement("iframe");
+  iframe.style.display = "none";
+  iframe.src = url;
+  document.body.appendChild(iframe);
+  iframe.onload = () => {
+    iframe.contentWindow.print();
+    setTimeout(() => {
+      document.body.removeChild(iframe);
+      URL.revokeObjectURL(url);
+    }, 2000);
+  };
+}
+
+function gerarPDFBlob(resultado, paciente, doc) {
+  // Re-run the same rendering logic and return blob
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const marginLeft = 20;
+  const marginRight = 20;
+  const usableWidth = pageWidth - marginLeft - marginRight;
+  const hoje = new Date().toLocaleDateString("pt-BR");
+  const headerHeight = paciente ? 36 : 28;
+  const lineHeight = 6;
+  const footerHeight = 20;
+
+  addHeader(doc, pageWidth, hoje, paciente);
+
+  let y = headerHeight + 10;
+  const lines = resultado.split("\n");
+
+  lines.forEach((line) => {
+    if (line.startsWith("# SOLICITAÇÃO") || line.startsWith("**Médico") || line.startsWith("**Data")) return;
+
+    if (y > pageHeight - footerHeight - 10) {
+      addFooter(doc, pageWidth, pageHeight);
+      doc.addPage();
+      addHeader(doc, pageWidth, hoje, paciente);
+      y = headerHeight + 10;
+    }
+
+    if (line.startsWith("### ")) {
+      if (y > headerHeight + 10) y += 2;
+      doc.setFillColor(240, 253, 250);
+      doc.roundedRect(marginLeft, y - 4, usableWidth, 8, 2, 2, "F");
+      doc.setTextColor(5, 150, 105);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(10);
+      doc.text(line.replace("### ", ""), marginLeft + 3, y + 1);
+      y += lineHeight + 2;
+    } else if (line.startsWith("## ")) {
+      if (y > headerHeight + 10) y += 3;
+      doc.setTextColor(30, 30, 30);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(11);
+      doc.text(line.replace("## ", ""), marginLeft, y);
+      y += lineHeight + 2;
+    } else if (line.startsWith("- [x] ")) {
+      doc.setDrawColor(16, 185, 129);
+      doc.setFillColor(16, 185, 129);
+      doc.roundedRect(marginLeft, y - 3.5, 4, 4, 0.8, 0.8, "FD");
+      doc.setTextColor(255, 255, 255);
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.text("✓", marginLeft + 0.7, y - 0.2);
+      doc.setTextColor(50, 50, 50);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9.5);
+      const examText = line.replace("- [x] ", "");
+      const wrapped = doc.splitTextToSize(examText, usableWidth - 8);
+      doc.text(wrapped, marginLeft + 7, y);
+      y += lineHeight * wrapped.length;
+    } else if (line.startsWith("---")) {
+      y += 2;
+      doc.setDrawColor(200, 200, 200);
+      doc.setLineWidth(0.3);
+      doc.line(marginLeft, y, pageWidth - marginRight, y);
+      y += 4;
+    } else if (line.startsWith("* **")) {
+      doc.setTextColor(80, 80, 80);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(8.5);
+      const clean = line.replace(/\*\*/g, "").replace("* ", "• ");
+      const wrapped = doc.splitTextToSize(clean, usableWidth - 4);
+      doc.text(wrapped, marginLeft + 2, y);
+      y += lineHeight * wrapped.length;
+    } else if (line.trim() !== "") {
+      doc.setTextColor(60, 60, 60);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(9);
+      const wrapped = doc.splitTextToSize(line, usableWidth);
+      doc.text(wrapped, marginLeft, y);
+      y += lineHeight * wrapped.length;
+    } else {
+      y += 2;
+    }
+  });
+
+  addFooter(doc, pageWidth, pageHeight);
+  return doc.output("blob");
+}
+
+function addHeader(doc, pageWidth, hoje, paciente = null) {
+  const headerHeight = paciente ? 36 : 28;
   doc.setFillColor(16, 185, 129);
-  doc.rect(0, 0, pageWidth, 28, "F");
+  doc.rect(0, 0, pageWidth, headerHeight, "F");
   doc.setTextColor(255, 255, 255);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
@@ -143,9 +260,16 @@ function addHeader(doc, pageWidth, hoje) {
   doc.setFont("helvetica", "normal");
   doc.text("Dr. Claudio M Orenstein  |  CRM-SP 58120", pageWidth / 2, 18, { align: "center" });
   doc.text(`Data: ${hoje}`, pageWidth / 2, 23, { align: "center" });
+  if (paciente) {
+    let info = `Paciente: ${paciente.nome}`;
+    if (paciente.idade) info += `  |  Idade: ${paciente.idade} anos`;
+    if (paciente.paciente_id) info += `  |  ID: ${paciente.paciente_id}`;
+    doc.setFont("helvetica", "bold");
+    doc.text(info, pageWidth / 2, 30, { align: "center" });
+  }
   doc.setDrawColor(16, 185, 129);
   doc.setLineWidth(0.5);
-  doc.line(20, 32, pageWidth - 20, 32);
+  doc.line(20, headerHeight + 4, pageWidth - 20, headerHeight + 4);
 }
 
 function addFooter(doc, pageWidth, pageHeight) {
