@@ -1,11 +1,14 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Droplets, FlaskConical, Shield } from "lucide-react";
 
 const examGroups = [
   {
     id: "coagulacao_sangue",
-    group: "🩸 Sangue e Coagulação",
+    group: "Sangue e Coagulação",
+    icon: <Droplets className="w-4 h-4" />,
+    iconBg: "bg-red-100 text-red-600",
     items: [
       "Hemograma Completo",
       "Coagulograma Completo (TAP, RNI, TTPA e Tempo de Sangramento)",
@@ -17,7 +20,9 @@ const examGroups = [
   },
   {
     id: "bioquimica",
-    group: "🧪 Bioquímica",
+    group: "Bioquímica",
+    icon: <FlaskConical className="w-4 h-4" />,
+    iconBg: "bg-blue-100 text-blue-600",
     items: [
       "Glicemia em Jejum",
       "Creatinina",
@@ -31,7 +36,9 @@ const examGroups = [
   },
   {
     id: "infeccioso_urina",
-    group: "🦠 Infeccioso e Urina",
+    group: "Infeccioso e Urina",
+    icon: <Shield className="w-4 h-4" />,
+    iconBg: "bg-emerald-100 text-emerald-600",
     items: [
       "Urina Tipo I (EAS)",
       "Marcadores de Hepatites (HBsAg e Anti-HCV)",
@@ -53,7 +60,8 @@ export default function ExamesPreOperatoriosPanel({ selectedExams = {}, onExamCh
       {examGroups.map((group) => (
         <Card key={group.id} className="border border-gray-200 shadow-sm">
           <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-700 tracking-wide">
+              <span className={`p-1.5 rounded-md ${group.iconBg}`}>{group.icon}</span>
               {group.group}
             </CardTitle>
           </CardHeader>

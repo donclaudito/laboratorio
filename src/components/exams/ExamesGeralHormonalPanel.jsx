@@ -1,11 +1,14 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Microscope, Activity, Zap } from "lucide-react";
 
 const examGroups = [
   {
     id: "hemato_ferro",
-    group: "🩸 Hematologia & Ferro",
+    group: "Hematologia & Ferro",
+    icon: <Microscope className="w-4 h-4" />,
+    iconBg: "bg-red-100 text-red-600",
     items: [
       "Hemograma Completo",
       "Ferritina",
@@ -19,7 +22,9 @@ const examGroups = [
   },
   {
     id: "tireoide_vitaminas",
-    group: "🦋 Tireoide & Vitaminas",
+    group: "Tireoide & Vitaminas",
+    icon: <Activity className="w-4 h-4" />,
+    iconBg: "bg-teal-100 text-teal-600",
     items: [
       "TSH (Hormônio Estimulante da Tireoide)",
       "T4 Livre",
@@ -33,7 +38,9 @@ const examGroups = [
   },
   {
     id: "hormonal",
-    group: "⚗️ Hormônios & Minerais",
+    group: "Hormônios & Minerais",
+    icon: <Zap className="w-4 h-4" />,
+    iconBg: "bg-violet-100 text-violet-600",
     items: [
       "Zinco Sérico",
       "Selênio Sérico",
@@ -59,7 +66,8 @@ export default function ExamesGeralHormonalPanel({ selectedExams = {}, onExamCha
       {examGroups.map((group) => (
         <Card key={group.id} className="border border-gray-200 shadow-sm">
           <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-700 tracking-wide">
+              <span className={`p-1.5 rounded-md ${group.iconBg}`}>{group.icon}</span>
               {group.group}
             </CardTitle>
           </CardHeader>

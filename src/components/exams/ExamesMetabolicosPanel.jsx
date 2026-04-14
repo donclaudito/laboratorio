@@ -1,11 +1,14 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Droplets, Heart, FlaskConical } from "lucide-react";
 
 const examGroups = [
   {
     id: "glicidico",
-    group: "🩸 Metabolismo Glicídico",
+    group: "Metabolismo Glicídico",
+    icon: <Droplets className="w-4 h-4" />,
+    iconBg: "bg-red-100 text-red-600",
     items: [
       "Glicemia em Jejum",
       "Hemoglobina Glicada (HbA1c)",
@@ -17,7 +20,9 @@ const examGroups = [
   },
   {
     id: "lipidico",
-    group: "🫀 Perfil Lipídico & Risco CV",
+    group: "Perfil Lipídico & Risco CV",
+    icon: <Heart className="w-4 h-4" />,
+    iconBg: "bg-rose-100 text-rose-600",
     items: [
       "Colesterol Total e Frações (LDL, HDL, VLDL)",
       "Triglicerídeos",
@@ -30,7 +35,9 @@ const examGroups = [
   },
   {
     id: "inflamacao",
-    group: "🔬 Inflamação, Nutrição & Outros",
+    group: "Inflamação, Nutrição & Outros",
+    icon: <FlaskConical className="w-4 h-4" />,
+    iconBg: "bg-amber-100 text-amber-600",
     items: [
       "PCR-ultrassensível (PCR-us)",
       "Fibrinogênio",
@@ -57,7 +64,8 @@ export default function ExamesMetabolicosPanel({ selectedExams = {}, onExamChang
       {examGroups.map((group) => (
         <Card key={group.id} className="border border-gray-200 shadow-sm">
           <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-700 tracking-wide">
+              <span className={`p-1.5 rounded-md ${group.iconBg}`}>{group.icon}</span>
               {group.group}
             </CardTitle>
           </CardHeader>

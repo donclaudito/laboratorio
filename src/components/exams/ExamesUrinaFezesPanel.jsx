@@ -1,11 +1,14 @@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { TestTube, Microscope, FlaskConical } from "lucide-react";
 
 const examGroups = [
   {
     id: "urina",
-    group: "🧪 Urina",
+    group: "Urina",
+    icon: <TestTube className="w-4 h-4" />,
+    iconBg: "bg-yellow-100 text-yellow-600",
     items: [
       "Urina Tipo I (EAS)",
       "Microalbuminúria (Amostra isolada ou 24h)",
@@ -16,7 +19,9 @@ const examGroups = [
   },
   {
     id: "fezes_basico",
-    group: "🔬 Fezes – Básico",
+    group: "Fezes – Básico",
+    icon: <Microscope className="w-4 h-4" />,
+    iconBg: "bg-orange-100 text-orange-600",
     items: [
       "Protoparasitológico de Fezes (PPF)",
       "Sangue Oculto nas Fezes (Pesquisa imunocromatográfica)",
@@ -27,7 +32,9 @@ const examGroups = [
   },
   {
     id: "fezes_avancado",
-    group: "🧫 Fezes – Avançado",
+    group: "Fezes – Avançado",
+    icon: <FlaskConical className="w-4 h-4" />,
+    iconBg: "bg-lime-100 text-lime-600",
     items: [
       "Calprotectina Fecal",
       "Elastase Pancreática Fecal",
@@ -49,7 +56,8 @@ export default function ExamesUrinaFezesPanel({ selectedExams = {}, onExamChange
       {examGroups.map((group) => (
         <Card key={group.id} className="border border-gray-200 shadow-sm">
           <CardHeader className="pb-2 pt-4 px-4">
-            <CardTitle className="text-sm font-semibold text-gray-700 tracking-wide">
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold text-gray-700 tracking-wide">
+              <span className={`p-1.5 rounded-md ${group.iconBg}`}>{group.icon}</span>
               {group.group}
             </CardTitle>
           </CardHeader>
