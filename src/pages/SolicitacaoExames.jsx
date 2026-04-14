@@ -8,6 +8,7 @@ import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
 import ExamesGeralHormonalPanel from "../components/exams/ExamesGeralHormonalPanel";
 import ExamesUrinaFezesPanel from "../components/exams/ExamesUrinaFezesPanel";
+import ExamesPreOperatoriosPanel from "../components/exams/ExamesPreOperatoriosPanel";
 import PacienteSelector from "../components/exams/PacienteSelector";
 import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
@@ -21,20 +22,6 @@ export default function SolicitacaoExames() {
 
   // Dados das seções de exames (seções 1-4 tratadas como painéis separados)
   const examSections = [
-    {
-      id: "pre_operatorios",
-      title: "5. Pré-Operatórios (Laboratoriais)",
-      exams: [
-        "Coagulograma (TAP, PTTa, Fibrinogênio)",
-        "Tipo Sanguíneo e Fator Rh",
-        "HIV 1 e 2",
-        "HBsAg e Anti-HBs (Hepatite B)",
-        "Anti-HCV (Hepatite C)",
-        "VDRL/FTA-Abs (Sífilis)",
-        "Eletroforese de Proteínas",
-        "Eletrólitos (Sódio e Potássio)"
-      ]
-    },
     {
       id: "exames_complementares",
       title: "6. Exames Complementares (Imagiológicos e Gráficos)",
@@ -323,6 +310,17 @@ export default function SolicitacaoExames() {
               </h3>
               <ExamesUrinaFezesPanel
                 selectedExams={selectedExams["urina_fezes"] || {}}
+                onExamChange={handleExamChange}
+              />
+            </div>
+
+            {/* Seção Pré-Operatórios em 3 colunas */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-700 mb-3">
+                5. Pré-Operatórios (Laboratoriais)
+              </h3>
+              <ExamesPreOperatoriosPanel
+                selectedExams={selectedExams["pre_operatorios"] || {}}
                 onExamChange={handleExamChange}
               />
             </div>
