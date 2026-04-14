@@ -4,8 +4,8 @@ export function gerarPDF(resultado, paciente = null) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const marginLeft = 20;
-  const marginRight = 20;
+  const marginLeft = 12;
+  const marginRight = 12;
   const usableWidth = pageWidth - marginLeft - marginRight;
 
   const hoje = new Date().toLocaleDateString("pt-BR");
@@ -15,9 +15,9 @@ export function gerarPDF(resultado, paciente = null) {
   addHeader(doc, pageWidth, hoje, paciente);
 
   // ─── CONTEÚDO ────────────────────────────────────────────────────────────
-  let y = headerHeight + 10;
-  const lineHeight = 6;
-  const footerHeight = 20;
+  let y = headerHeight + 8;
+  const lineHeight = 5.5;
+  const footerHeight = 18;
 
   const lines = resultado.split("\n");
 
@@ -26,7 +26,8 @@ export function gerarPDF(resultado, paciente = null) {
     if (
       line.startsWith("# SOLICITAÇÃO") ||
       line.startsWith("**Médico") ||
-      line.startsWith("**Data")
+      line.startsWith("**Data") ||
+      line.startsWith("**Paciente")
     ) return;
 
     // Nova página se necessário
@@ -139,12 +140,12 @@ function gerarPDFBlob(resultado, paciente, doc) {
   // Re-run the same rendering logic and return blob
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
-  const marginLeft = 20;
-  const marginRight = 20;
+  const marginLeft = 12;
+  const marginRight = 12;
   const usableWidth = pageWidth - marginLeft - marginRight;
   const hoje = new Date().toLocaleDateString("pt-BR");
   const headerHeight = paciente ? 36 : 26;
-  const lineHeight = 6;
+  const lineHeight = 5.5;
   const footerHeight = 20;
 
   addHeader(doc, pageWidth, hoje, paciente);
@@ -153,7 +154,7 @@ function gerarPDFBlob(resultado, paciente, doc) {
   const lines = resultado.split("\n");
 
   lines.forEach((line) => {
-    if (line.startsWith("# SOLICITAÇÃO") || line.startsWith("**Médico") || line.startsWith("**Data")) return;
+    if (line.startsWith("# SOLICITAÇÃO") || line.startsWith("**Médico") || line.startsWith("**Data") || line.startsWith("**Paciente")) return;
 
     if (y > pageHeight - footerHeight - 10) {
       addFooter(doc, pageWidth, pageHeight);
