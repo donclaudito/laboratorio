@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { FileText, Copy, Trash2, CheckCircle, Download, Printer } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
 import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
+import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
 import PacienteSelector from "../components/exams/PacienteSelector";
 import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
@@ -16,23 +17,8 @@ export default function SolicitacaoExames() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
 
-  // Dados das seções de exames (seção metabólica tratada separadamente com painel 3 colunas)
+  // Dados das seções de exames (seções metabólica e renal/hepática tratadas separadamente)
   const examSections = [
-    {
-      id: "renal_hepatica",
-      title: "2. Função Renal, Hepática e Pancreática (Sangue)",
-      exams: [
-        "Ureia",
-        "Creatinina",
-        "TGO (AST) / TGP (ALT)",
-        "GGT (Gama-Glutamil Transferase)",
-        "Bilirrubinas (Total e Frações)",
-        "Amilase",
-        "Lipase",
-        "Fosfatase Alcalina",
-        "Albumina"
-      ]
-    },
     {
       id: "geral_hormonal",
       title: "3. Avaliação Geral, Hemato e Hormonal (Sangue)",
@@ -326,6 +312,17 @@ export default function SolicitacaoExames() {
               </h3>
               <ExamesMetabolicosPanel
                 selectedExams={selectedExams["metabolica"] || {}}
+                onExamChange={handleExamChange}
+              />
+            </div>
+
+            {/* Seção Renal/Hepática em 3 colunas */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-700 mb-3">
+                2. Função Renal, Hepática e Pancreática (Sangue)
+              </h3>
+              <ExamesRenalHepaticaPanel
+                selectedExams={selectedExams["renal_hepatica"] || {}}
                 onExamChange={handleExamChange}
               />
             </div>
