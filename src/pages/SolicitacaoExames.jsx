@@ -6,6 +6,7 @@ import { FileText, Copy, Trash2, CheckCircle, Download, Printer } from "lucide-r
 import ExamSection from "../components/exams/ExamSection";
 import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
+import ExamesGeralHormonalPanel from "../components/exams/ExamesGeralHormonalPanel";
 import PacienteSelector from "../components/exams/PacienteSelector";
 import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
@@ -17,21 +18,8 @@ export default function SolicitacaoExames() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
 
-  // Dados das seções de exames (seções metabólica e renal/hepática tratadas separadamente)
+  // Dados das seções de exames (seções metabólica, renal/hepática e geral/hormonal tratadas separadamente)
   const examSections = [
-    {
-      id: "geral_hormonal",
-      title: "3. Avaliação Geral, Hemato e Hormonal (Sangue)",
-      exams: [
-        "Hemograma Completo",
-        "Ferritina",
-        "TSH (Hormônio Estimulante da Tireoide)",
-        "Vitamina D (25-OH Vitamina D)",
-        "Proteína C Reativa (PCR)",
-        "Vitamina B12",
-        "T4 Livre"
-      ]
-    },
     {
       id: "urina_fezes",
       title: "4. Urina e Fezes",
@@ -323,6 +311,17 @@ export default function SolicitacaoExames() {
               </h3>
               <ExamesRenalHepaticaPanel
                 selectedExams={selectedExams["renal_hepatica"] || {}}
+                onExamChange={handleExamChange}
+              />
+            </div>
+
+            {/* Seção Geral/Hemato/Hormonal em 3 colunas */}
+            <div>
+              <h3 className="text-base font-semibold text-gray-700 mb-3">
+                3. Avaliação Geral, Hemato e Hormonal (Sangue)
+              </h3>
+              <ExamesGeralHormonalPanel
+                selectedExams={selectedExams["geral_hormonal"] || {}}
                 onExamChange={handleExamChange}
               />
             </div>
