@@ -183,27 +183,36 @@ export default function SolicitacaoExames() {
     let resultado = `# SOLICITAÇÃO DE EXAMES\n\n**Médico Solicitante:** Dr Claudio M Orenstein CREMSP 58120\n**Data da Solicitação:** ${hoje}${pacienteInfo}\n\n---\n`;
     
     let examesSelecionados = 0;
-    let currentSection = "";
 
     const stripPrefix = (name) => {
       const match = name.match(/^(\d+\.\s)(.*)/);
       return match ? match[2] : name;
     };
 
-    examSections.forEach(section => {
+    // Seções dos painéis de colunas (1-5)
+    const painelSections = [
+      { id: "metabolica", title: "1. Avaliação Metabólica e Cardiovascular (Sangue)" },
+      { id: "renal_hepatica", title: "2. Função Renal, Hepática e Pancreática (Sangue)" },
+      { id: "geral_hormonal", title: "3. Avaliação Geral, Hemato e Hormonal (Sangue)" },
+      { id: "urina_fezes", title: "4. Urina e Fezes" },
+      { id: "pre_operatorios", title: "5. Pré-Operatórios (Laboratoriais)" },
+    ];
+
+    // Todas as seções em ordem
+    const todasSecoes = [
+      ...painelSections,
+      ...examSections.map(s => ({ id: s.id, title: s.title }))
+    ];
+
+    todasSecoes.forEach(section => {
       const sectionExams = selectedExams[section.id] || {};
       const examsForSection = Object.entries(sectionExams).filter(([_, checked]) => checked);
 
       if (examsForSection.length > 0) {
         examesSelecionados += examsForSection.length;
-        
-        if (currentSection !== "") {
-          resultado += "\n";
-        }
-        
+        resultado += "\n";
         const cleanSectionName = stripPrefix(section.title);
         resultado += `### ${cleanSectionName}\n`;
-        currentSection = section.title;
 
         examsForSection.forEach(([examName]) => {
           resultado += `- [x] ${examName}\n`;
