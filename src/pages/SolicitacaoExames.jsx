@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Copy, Trash2, CheckCircle } from "lucide-react";
+import { FileText, Copy, Trash2, CheckCircle, Download } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
+import { gerarPDF } from "../components/exams/PdfGenerator";
 
 export default function SolicitacaoExames() {
   const [selectedExams, setSelectedExams] = useState({});
@@ -361,26 +362,35 @@ export default function SolicitacaoExames() {
                 rows={15}
                 className="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 font-mono text-sm shadow-inner"
               />
-              <Button
-                onClick={copiarResultado}
-                className={`mt-4 px-6 py-3 font-bold shadow-md transition-all duration-300 ${
-                  copySuccess
-                    ? "bg-gray-500 hover:bg-gray-600"
-                    : "bg-emerald-500 hover:bg-emerald-600"
-                }`}
-              >
-                {copySuccess ? (
-                  <>
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    Copiado!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-5 h-5 mr-2" />
-                    Copiar Resultado
-                  </>
-                )}
-              </Button>
+              <div className="flex flex-wrap gap-3 mt-4">
+                <Button
+                  onClick={copiarResultado}
+                  className={`px-6 py-3 font-bold shadow-md transition-all duration-300 ${
+                    copySuccess
+                      ? "bg-gray-500 hover:bg-gray-600"
+                      : "bg-emerald-500 hover:bg-emerald-600"
+                  }`}
+                >
+                  {copySuccess ? (
+                    <>
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                      Copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-5 h-5 mr-2" />
+                      Copiar Resultado
+                    </>
+                  )}
+                </Button>
+                <Button
+                  onClick={() => gerarPDF(resultado)}
+                  className="bg-teal-600 hover:bg-teal-700 text-white px-6 py-3 font-bold shadow-md transition-all duration-300 hover:scale-105"
+                >
+                  <Download className="w-5 h-5 mr-2" />
+                  Exportar PDF
+                </Button>
+              </div>
             </div>
           )}
         </Card>
