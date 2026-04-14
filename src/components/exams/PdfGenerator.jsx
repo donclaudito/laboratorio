@@ -9,35 +9,10 @@ export function gerarPDF(resultado, paciente = null) {
   const usableWidth = pageWidth - marginLeft - marginRight;
 
   const hoje = new Date().toLocaleDateString("pt-BR");
-  const headerHeight = paciente ? 36 : 28;
+  const headerHeight = paciente ? 36 : 26;
 
   // ─── CABEÇALHO ───────────────────────────────────────────────────────────
-  doc.setFillColor(16, 185, 129); // emerald-500
-  doc.rect(0, 0, pageWidth, headerHeight, "F");
-
-  doc.setTextColor(255, 255, 255);
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("SOLICITAÇÃO DE EXAMES", pageWidth / 2, 11, { align: "center" });
-
-  doc.setFontSize(9);
-  doc.setFont("helvetica", "normal");
-  doc.text("Dr. Claudio M Orenstein  |  CRM-SP 58120", pageWidth / 2, 18, { align: "center" });
-  doc.text(`Data: ${hoje}`, pageWidth / 2, 23, { align: "center" });
-
-  if (paciente) {
-    let pacienteInfo = `Paciente: ${paciente.nome}`;
-    if (paciente.idade) pacienteInfo += `  |  Idade: ${paciente.idade} anos`;
-    if (paciente.paciente_id) pacienteInfo += `  |  ID: ${paciente.paciente_id}`;
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(9);
-    doc.text(pacienteInfo, pageWidth / 2, 30, { align: "center" });
-  }
-
-  // ─── LINHA SEPARADORA ────────────────────────────────────────────────────
-  doc.setDrawColor(16, 185, 129);
-  doc.setLineWidth(0.5);
-  doc.line(marginLeft, headerHeight + 4, pageWidth - marginRight, headerHeight + 4);
+  addHeader(doc, pageWidth, hoje, paciente);
 
   // ─── CONTEÚDO ────────────────────────────────────────────────────────────
   let y = headerHeight + 10;
@@ -59,7 +34,7 @@ export function gerarPDF(resultado, paciente = null) {
       addFooter(doc, pageWidth, pageHeight);
       doc.addPage();
       addHeader(doc, pageWidth, hoje, paciente);
-      y = (paciente ? 36 : 28) + 10;
+      y = (paciente ? 36 : 26) + 10;
     }
 
     if (line.startsWith("### ")) {
@@ -168,7 +143,7 @@ function gerarPDFBlob(resultado, paciente, doc) {
   const marginRight = 20;
   const usableWidth = pageWidth - marginLeft - marginRight;
   const hoje = new Date().toLocaleDateString("pt-BR");
-  const headerHeight = paciente ? 36 : 28;
+  const headerHeight = paciente ? 36 : 26;
   const lineHeight = 6;
   const footerHeight = 20;
 
@@ -249,39 +224,70 @@ function gerarPDFBlob(resultado, paciente, doc) {
 }
 
 function addHeader(doc, pageWidth, hoje, paciente = null) {
-  const headerHeight = paciente ? 36 : 28;
-  doc.setFillColor(16, 185, 129);
+  const headerHeight = paciente ? 36 : 26;
+
+  // Fundo cinza claro para alto contraste P&B
+  doc.setFillColor(204, 204, 204); // #CCCCCC
   doc.rect(0, 0, pageWidth, headerHeight, "F");
-  doc.setTextColor(255, 255, 255);
+
+  // Borda preta ao redor do cabeçalho
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.8);
+  doc.rect(0, 0, pageWidth, headerHeight, "S");
+
+  // Coluna esquerda: Nome do médico
+  doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "bold");
-  doc.setFontSize(16);
-  doc.text("SOLICITAÇÃO DE EXAMES", pageWidth / 2, 11, { align: "center" });
+  doc.setFontSize(13);
+  doc.text("Dr. Claudio M Orenstein", 8, 10);
+
   doc.setFontSize(9);
   doc.setFont("helvetica", "normal");
-  doc.text("Dr. Claudio M Orenstein  |  CRM-SP 58120", pageWidth / 2, 18, { align: "center" });
-  doc.text(`Data: ${hoje}`, pageWidth / 2, 23, { align: "center" });
-  if (paciente) {
-    let info = `Paciente: ${paciente.nome}`;
-    if (paciente.idade) info += `  |  Idade: ${paciente.idade} anos`;
-    if (paciente.paciente_id) info += `  |  ID: ${paciente.paciente_id}`;
-    doc.setFont("helvetica", "bold");
-    doc.text(info, pageWidth / 2, 30, { align: "center" });
-  }
-  doc.setDrawColor(16, 185, 129);
+  doc.text("CRM-SP 58120", 8, 17);
+
+  // Coluna central: Título
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(14);
+  doc.text("SOLICITAÇÃO DE EXAMES", pageWidth / 2, 12, { align: "center" });
+
+  // Coluna direita: Data
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(10);
+  doc.text(`Data: ${hoje}`, pageWidth - 8, 10, { align: "right" });
+
+  // Linha separadora preta
+  doc.setDrawColor(0, 0, 0);
   doc.setLineWidth(0.5);
-  doc.line(20, headerHeight + 4, pageWidth - 20, headerHeight + 4);
+  doc.line(0, headerHeight, pageWidth, headerHeight);
+
+  // Linha de paciente (fundo branco levemente cinza)
+  if (paciente) {
+    doc.setFillColor(235, 235, 235);
+    doc.rect(0, headerHeight, pageWidth, 10, "F");
+    doc.setDrawColor(0, 0, 0);
+    doc.setLineWidth(0.3);
+    doc.rect(0, headerHeight, pageWidth, 10, "S");
+
+    let info = `Paciente: ${paciente.nome}`;
+    if (paciente.idade) info += `   |   Idade: ${paciente.idade} anos`;
+    if (paciente.paciente_id) info += `   |   ID: ${paciente.paciente_id}`;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 0, 0);
+    doc.text(info, pageWidth / 2, headerHeight + 6.5, { align: "center" });
+  }
 }
 
 function addFooter(doc, pageWidth, pageHeight) {
   const footerY = pageHeight - 14;
-  doc.setDrawColor(16, 185, 129);
-  doc.setLineWidth(0.5);
-  doc.line(20, footerY - 3, pageWidth - 20, footerY - 3);
 
-  doc.setFillColor(16, 185, 129);
+  doc.setFillColor(204, 204, 204); // cinza claro P&B
   doc.rect(0, footerY, pageWidth, 14, "F");
+  doc.setDrawColor(0, 0, 0);
+  doc.setLineWidth(0.5);
+  doc.rect(0, footerY, pageWidth, 14, "S");
 
-  doc.setTextColor(255, 255, 255);
+  doc.setTextColor(0, 0, 0);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(8);
   doc.text(
