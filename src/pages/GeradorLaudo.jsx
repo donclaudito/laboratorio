@@ -762,6 +762,158 @@ const getAnamnese = (motivo, procedimento) => {
   return `Paciente encaminhado para avaliação cirúrgica eletiva com diagnóstico de ${motivo}. Relata sintomas compatíveis com a patologia de base há [X] meses/anos, com repercussão na qualidade de vida e limitação de atividades cotidianas. Exames complementares confirmam o diagnóstico. Sem episódios agudos recentes. Indica-se tratamento cirúrgico eletivo: ${proc}.`;
 };
 
+const EXAME_FISICO_POR_MOTIVO = {
+  // ── HÉRNIAS INGUINAIS ────────────────────────────────────────────────────
+  "Hérnia Inguinal Direita":
+    "Bom estado geral, corado, hidratado, afebril. PA: [X] mmHg. FC: [X] bpm. Peso: [X] kg. Abdômen plano, flácido, sem visceromegalias. À inspeção e palpação da região inguinal direita: abaulamento visível / palpável à manobra de Valsalva, de conteúdo redutível, sem sinais de encarceramento ou estrangulamento (nega dor intensa, sem febre, sem sinais de irritação peritoneal). Anel inguinal externo [alargado]. Anel inguinal interno digitalmente patente.",
+  "Hérnia Inguinal Esquerda":
+    "Bom estado geral, corado, hidratado, afebril. Abdômen plano, flácido. À palpação da região inguinal esquerda: abaulamento palpável à manobra de Valsalva, redutível, sem sinais de encarceramento. Anel inguinal externo alargado à esquerda.",
+  "Hérnia Inguinal Bilateral":
+    "Bom estado geral, corado, hidratado, afebril. Abdômen plano, flácido. Abaulamento bilateral nas regiões inguinais à manobra de Valsalva, ambos redutíveis, sem sinais de encarceramento ou estrangulamento. Anéis inguinais externos alargados bilateralmente.",
+  "Hérnia Inguinal Direita Recidivada":
+    "Bom estado geral. Cicatriz cirúrgica em região inguinal direita (herniorrafia prévia). Abaulamento recidivado palpável à manobra de Valsalva, redutível. Sem sinais flogísticos sobre a cicatriz. Anel inguinal patente.",
+  "Hérnia Inguinal Esquerda Recidivada":
+    "Bom estado geral. Cicatriz cirúrgica em região inguinal esquerda (herniorrafia prévia). Abaulamento recidivado palpável à Valsalva, redutível. Sem sinais flogísticos.",
+  "Hérnia Inguinal Bilateral Recidivada":
+    "Bom estado geral. Cicatrizes de herniorrafias prévias bilaterais. Abaulamentos recidivados bilaterais à Valsalva, redutíveis. Sem sinais flogísticos.",
+  // ── HÉRNIAS CRURAIS ──────────────────────────────────────────────────────
+  "Hérnia Crural Direita":
+    "Bom estado geral. Abaulamento palpável na região crural/femoral direita (medial ao ligamento inguinal), de pequenas dimensões, redutível à palpação. Sem sinais de encarceramento. Anel femoral palpável.",
+  "Hérnia Crural Esquerda":
+    "Bom estado geral. Abaulamento palpável na região crural/femoral esquerda, redutível. Sem sinais de encarceramento.",
+  "Hérnia Crural Bilateral":
+    "Bom estado geral. Abaulamentos palpáveis em ambas as regiões femorais, redutíveis. Sem sinais de encarceramento bilateral.",
+  // ── HÉRNIAS DA PAREDE ───────────────────────────────────────────────────
+  "Hérnia Umbilical":
+    "Bom estado geral, corado, hidratado. Abdômen globoso / plano. À inspeção: abaulamento umbilical visível em ortostatismo. À palpação: defeito da parede aponeurótica umbilical (diâmetro aproximado: [X] cm), conteúdo redutível ao decúbito, sem sinais de encarceramento. Anel umbilical alargado.",
+  "Hérnia Umbilical Recidivada":
+    "Bom estado geral. Cicatriz umbilical de herniorrafia prévia. Novo defeito herniário umbilical palpável, redutível. Sem sinais flogísticos ou encarceramento.",
+  "Hérnia Epigástrica":
+    "Bom estado geral. À palpação da linha alba em região epigástrica: nódulo / defeito aponeurótico de [X] cm, conteúdo lipomatoso / redutível. Sem sinais de encarceramento. Dor leve à digitopressão.",
+  "Hérnia Incisional":
+    "Bom estado geral. Cicatriz cirúrgica abdominal ([descrever localização]) com abaulamento ao longo da incisão. Defeito da parede aponeurótica de aproximadamente [X] × [X] cm à palpação. Conteúdo redutível ao decúbito. Sem sinais de encarceramento. Pele da cicatriz íntegra / com alterações tróficas.",
+  "Hérnia Incisional Recidivada":
+    "Bom estado geral. Cicatrizes de correções prévias. Defeito herniário recidivado de [X] cm, conteúdo redutível. Sem encarceramento.",
+  "Hérnia de Spiegel":
+    "Abdômen sem abaulamento visível. À palpação bimanual da região de linha semilunar [D/E], detecta-se massa palpável ao esforço / manobra de Valsalva, de difícil delimitação ao repouso. Sem sinais de encarceramento.",
+  "Hérnia Lombar":
+    "Abaulamento visível/palpável em região lombar [D/E]. Conteúdo redutível, sem dor intensa. Defeito aponeurótico palpável.",
+  "Hérnia Obturadora":
+    "Bom estado geral. Sinal de Howship-Romberg positivo (dor na face interna da coxa à rotação interna). Massa de difícil palpação em região obturadora.",
+  "Hérnia Paraesofágica / Hiatal":
+    "Bom estado geral. Abdômen sem abaulamento. Sem dor à palpação epigástrica no momento. Sem sinais de complicações agudas.",
+  "Diástase dos Retos Abdominais":
+    "Abdômen com abaulamento central na linha alba, evidenciado à elevação ativa do tronco (head-lift test positivo). Diástase dos retos abdominais palpável, de aproximadamente [X] cm de largura. Sem defeito herniário associado.",
+  // ── VESÍCULA ────────────────────────────────────────────────────────────
+  "Colelitíase / Colecistite Crônica Calculosa":
+    "Bom estado geral, corado, hidratado, afebril. Ictérico: não. Abdômen plano, flácido, ruídos hidroaéreos presentes. Leve dor à palpação profunda em hipocôndrio direito / ponto cístico. Sinal de Murphy: negativo no momento. Vesícula biliar não palpável. Sem sinais de peritonismo.",
+  "Colecistite Aguda (eletiva após resolução)":
+    "Bom estado geral, afebril. Abdômen com leve sensibilidade em hipocôndrio direito à palpação profunda. Sinal de Murphy negativo no momento. Sem icterícia. Quadro inflamatório agudo resolvido.",
+  "Coledocolitíase":
+    "Bom estado geral. Icterícia discreta/moderada em escleras e pele. Colúria referida. Abdômen com dor à palpação em hipocôndrio direito e epigástrio. Sinal de Murphy: [positivo/negativo]. Sem sinais de peritonismo.",
+  "Pólipo de Vesícula Biliar":
+    "Bom estado geral, corado, hidratado, afebril. Abdômen sem dor à palpação. Vesícula biliar não palpável. Exame físico sem alterações significativas.",
+  "Colangite Crônica":
+    "Bom estado geral. Icterícia leve. Dor à palpação em hipocôndrio direito. Temperatura: [X]°C. Sem peritonismo.",
+  // ── ESÔFAGO / ESTÔMAGO ───────────────────────────────────────────────────
+  "Doença do Refluxo Gastroesofágico (DRGE) — Fundoplicatura":
+    "Bom estado geral. Abdômen plano, flácido, sem visceromegalias. Leve dor à palpação epigástrica. Sem sinais de alarme (disfagia progressiva, perda de peso, massa palpável). Exame físico sem alterações específicas.",
+  "Hérnia Hiatal Mista / Paraesofágica":
+    "Bom estado geral. Abdômen sem alterações à palpação. Sem sinais de complicações agudas. Ausculta cardiopulmonar sem alterações.",
+  "Acalasia de Esôfago":
+    "Estado geral [regular/bom], com perda de peso [X] kg. Abdômen sem alterações à palpação. Sem sinais de massa cervical ou supraclavicular.",
+  "Divertículo de Zenker":
+    "Bom estado geral. Pescoço sem massas palpáveis. Abdômen sem alterações. Sem sinais de aspiração pulmonar no exame físico.",
+  "Úlcera Péptica Gástrica Refratária":
+    "Bom estado geral. Abdômen plano, flácido. Dor à palpação profunda em epigástrio. Sem sinais de peritonismo ou perfuração. Ruídos hidroaéreos presentes.",
+  "Úlcera Péptica Duodenal Refratária":
+    "Bom estado geral. Dor à palpação em epigástrio e hipocôndrio direito. Sem defesa muscular. Ruídos hidroaéreos presentes.",
+  "Tumor Benigno Gástrico (GIST / Leiomioma)":
+    "Bom estado geral. Abdômen plano. Massa palpável em epigástrio / [localização] de [X] cm, de consistência [firme/amolecida], [móvel/fixa]. Sem sinais de peritonismo.",
+  "Estenose Pilórica do Adulto":
+    "Estado geral [regular]. Abdômen com distensão epigástrica. Ruídos de sucussão gástrica presentes. Peristaltismo visível em epigástrio após refeição. Desidratação [leve/moderada].",
+  // ── INTESTINO DELGADO ─────────────────────────────────────────────────────
+  "Aderências / Bridas Intestinais (cirurgia eletiva)":
+    "Bom estado geral. Cicatriz cirúrgica abdominal anterior. Abdômen plano, flácido, sem distensão. Ruídos hidroaéreos normais. Sem sinais de obstrução no momento. Sem peritonismo.",
+  "Doença de Crohn — Ressecção Eletiva":
+    "Estado geral [bom/regular]. Abdômen com dor à palpação em fossa ilíaca direita / [localização]. Massa palpável em FID de [X] cm (plastrão inflamatório). Sem sinais de peritonismo agudo. Fístulas entero-cutâneas: [presentes/ausentes]. Perianal: [normal/alterado].",
+  "Divertículo de Meckel Sintomático":
+    "Bom estado geral. Abdômen sem distensão. Dor à palpação em mesogástrio / fossa ilíaca direita. Sem sinais de peritonismo. Sem massa palpável.",
+  // ── CÓLON E RETO ─────────────────────────────────────────────────────────
+  "Doença Diverticular do Cólon Sintomática":
+    "Bom estado geral, afebril (fora de crise aguda). Abdômen com corda sigmoidiana palpável em fossa ilíaca esquerda, sensível à palpação profunda. Sem defesa muscular ou peritonismo. Ruídos hidroaéreos normais.",
+  "Megacólon Chagásico":
+    "Abdômen globoso e distendido. Timpanismo difuso à percussão. Ruídos hidroaéreos [diminuídos/aumentados]. Massa fecal palpável em flanco esquerdo e hipogástrio. Toque retal: ampola retal vazia / com fezes moldadas.",
+  "Colite Ulcerativa — Cirurgia Eletiva":
+    "Estado geral [regular/comprometido]. Abdômen com dor difusa à palpação. Sensibilidade aumentada em fossa ilíaca esquerda e hipogástrio. Distensão abdominal [leve/moderada]. Toque retal: [sangue/muco].",
+  "Prolapso Retal":
+    "Bom estado geral. Inspeção perianal: mucosa/parede retal exteriorizada ao esforço de [X] cm além da borda anal, de aspecto rosado/congestivo. Tônus esfincteriano [diminuído/normal]. Toque retal sem estenose.",
+  // ── ANORRETAL ─────────────────────────────────────────────────────────────
+  "Hemorróidas Grau III / IV":
+    "Bom estado geral. Inspeção perianal: mamilos hemorroidários externos visíveis / prolapsados. Prolapso de mamilos internos ao esforço (grau III) / prolapso irreversível (grau IV). Toque retal: ampola retal livre, sem massas. Anuscopia: coxins hemorroidários internos aumentados em posições [horária].",
+  "Fissura Anal Crônica":
+    "Inspeção perianal: fissura anal [posterior/anterior] na linha média, com bordas fibróticas, exposição de fibras do esfíncter interno, sentinela cutânea e papila anal hipertrófica associadas. Espasmo esfincteriano evidenciado ao toque (toque limitado pela dor).",
+  "Fístula Perianal (transesfincteriana / supraesfincteriana)":
+    "Inspeção perianal: orifício externo de fístula a [X] cm da borda anal, na posição [horária], com discreto halo de tecido cicatricial. Cordão fibroso palpável no trajeto. Toque retal: orifício interno palpável na linha denteada. Tônus esfincteriano preservado.",
+  "Fístula Perianal Baixa (interesfincteriana / submucosa)":
+    "Inspeção perianal: orifício externo de fístula a [X] cm da borda anal. Cordão fibroso superficial palpável. Toque retal: tônus preservado, orifício interno identificável.",
+  "Abscesso Anorretal Recorrente":
+    "Região perianal com hiperemia, edema e flutuação em [posição]. Toque retal: dor à palpação. Temperatura: [X]°C.",
+  "Cisto Pilonidal / Seio Pilonidal":
+    "Inspeção da região sacrococcígea: [orifícios/óstios] pilonidais na linha média, com secreção seropurulenta. Área de fibrose/cicatriz por episódios prévios. Sem sinais de infecção aguda no momento.",
+  // ── FÍGADO / PÂNCREAS / BAÇO ──────────────────────────────────────────────
+  "Cisto Hepático Simples Sintomático":
+    "Bom estado geral. Abdômen com leve dor à palpação em hipocôndrio direito. Hepatomegalia de [X] cm abaixo do rebordo costal / massa palpável. Sem icterícia ou ascite.",
+  "Esplenomegalia — Esplenectomia Eletiva":
+    "Bom estado geral. Abdômen com esplenomegalia palpável a [X] cm do rebordo costal esquerdo, de consistência [firme/amolecida], superfície regular. Sem dor aguda. Sem ascite.",
+  "Pseudocisto Pancreático Sintomático":
+    "Estado geral [bom/regular]. Abdômen com massa palpável em epigástrio / mesogástrio, de consistência cística, sensível à palpação. Ruídos hidroaéreos presentes. Sem sinais de peritonismo.",
+  "Pancreatite Crônica — Cirurgia Eletiva (Frey / Puestow / Beger)":
+    "Estado geral [regular], emagrecido. Abdômen com dor à palpação em epigástrio, sem peritonismo. Esteatorreia referida. Sem icterícia no momento.",
+  // ── TIREOIDE ──────────────────────────────────────────────────────────────
+  "Bócio Nodular — Tireoidectomia Parcial / Total":
+    "Bom estado geral. Pescoço com aumento do volume tireoidiano, visível em posição ortostática. À palpação: bócio [difuso/multinodular], consistência [firme/amolecida], superfície [irregular], sem dor. Nódulo dominante em lobo [D/E] de [X] cm. Linfonodos cervicais: não palpáveis. Sem disfagia ou disfonia referida ao exame.",
+  "Nódulo de Tireoide Indeterminado (Bethesda III / IV)":
+    "Bom estado geral. Tireoide com nódulo palpável em lobo [D/E], de [X] cm, consistência [firme/amolecida], superfície regular, sem dor. Sem linfonodomegalia cervical. Sem sinais de hiper ou hipotireoidismo ao exame.",
+  "Hipertireoidismo Refratário ao Tratamento Clínico":
+    "Estado geral [bom/regular]. Tireoide difusamente aumentada / nodular, consistência amolecida, sopro audível [presente/ausente]. Tremor fino de extremidades. Taquicardia (FC: [X] bpm). Pele quente e úmida. Exoftalmia [ausente/presente].",
+  "Hiperparatireoidismo Primário — Paratireoidectomia":
+    "Bom estado geral. Pescoço sem massas palpáveis visíveis. Região cervical anterior sem alterações. Sem dor óssea à compressão no momento.",
+  "Adenoma de Paratireoide":
+    "Exame físico do pescoço sem alterações palpáveis. Região cervical sem massas. Sem sinais de hipercalcemia grave (fraqueza muscular, confusão mental).",
+  // ── MAMA ──────────────────────────────────────────────────────────────────
+  "Fibroadenoma de Mama":
+    "Mamas simétricas, sem alterações cutâneas ou retração mamilar. À palpação: nódulo em mama [D/E], quadrante [X], de [X] cm, consistência elástica/firme, superfície regular, bem delimitado, móvel, indolor. Axilas livres de linfonodos palpáveis.",
+  "Tumor Filodes Benigno de Mama":
+    "Mama [D/E] com aumento de volume. Nódulo de [X] cm, consistência firme, lobulado, superfície irregular, móvel. Sem alterações cutâneas (pele de laranja, retração). Axila livre.",
+  "Ginecomastia":
+    "Aumento de tecido glandular subareolar bilateral / unilateral em [D/E], de [X] cm, consistência glandular (diferencia-se de lipomastia). Sem nódulos suspeitos, retração mamilar ou descarga papilar.",
+  "Abscesso Mamário Recorrente / Fístula de Ducto":
+    "Região periareolar com fístula de orifício a [X] cm do mamilo, com secreção [purulenta/serosa]. Área de fibrose periareolar. Mamilo com [inversão/desvio]. Sem linfonodomegalia axilar.",
+  // ── PARTES MOLES / DERMATOLOGIA ──────────────────────────────────────────
+  "Cisto Sebáceo / Epidérmico":
+    "Nódulo subcutâneo em [localização], de [X] cm, superfície lisa, consistência cística/amolecida, flutuante, bem delimitado, móvel em relação aos planos profundos. Orifício central (ponto negro) presente. Sem sinais flogísticos ativos (sem hiperemia, edema ou dor intensa). Pele suprajacente íntegra / com alterações pós-infecção.",
+  "Lipoma":
+    "Nódulo subcutâneo em [localização], de [X] cm, de consistência amolecida, superfície lobulada, bem delimitado, indolor, móvel em planos superficiais. Sem aderência a planos profundos. Pele suprajacente sem alterações.",
+  "Fibroma / Dermatofibroma":
+    "Nódulo cutâneo/subcutâneo em [localização], de [X] cm, firme, aderido à derme (sinal do dimple positivo no dermatofibroma), sem sinais inflamatórios. Indolor à palpação.",
+  "Nevo Melanocítico — Exérese Eletiva":
+    "Lesão pigmentada em [localização], de [X] × [X] mm, bordas [irregulares/regulares], coloração [marrom/enegrecida/heterogênea]. Critérios ABCDE: A [assimetria], B [bordas], C [cor], D [diâmetro > 6 mm], E [evolução]. Sem ulceração ou sangramento ativo. Linfonodos regionais não palpáveis.",
+  "Carcinoma Basocelular / Espinocelular (ressecção eletiva)":
+    "Lesão cutânea em [localização], de [X] mm, pérola/ulcerada/queratótica, bordas [elevadas/irregulares], sem sangramento ativo no momento. Sem linfonodomegalia regional palpável. Sem metástases à distância identificadas clinicamente.",
+  "Condiloma Acuminado Perianal (extenso)":
+    "Inspeção perianal: múltiplas lesões verrucosas, vegetantes, de coloração rósea/acastanhada, confluentes, cobrindo [X]% da região perianal. Sem necrose ou sangramento ativo. Toque retal: lesões intranais [presentes/ausentes].",
+  "Cisto Pilonidal / Seio Pilonidal":
+    "Inspeção da região sacrococcígea: óstios pilonidais na linha média com secreção. Área de fibrose. Sem sinais de infecção aguda.",
+  "Hidradenite Supurativa Perianal":
+    "Inspeção perianal e perineal: lesões nodulares, abscessos, trajetos fistulosos e cicatrizes retráteis em região [inguinal/perianal/perineal]. Secreção purulenta. Grau de Hurley: [I/II/III].",
+};
+
+const getExameFisico = (motivo) => {
+  if (EXAME_FISICO_POR_MOTIVO[motivo]) return EXAME_FISICO_POR_MOTIVO[motivo];
+  return `Bom estado geral, corado, hidratado, afebril. PA: [X] mmHg. FC: [X] bpm. Peso: [X] kg.\nAbdômen [plano/globoso], flácido, sem visceromegalias, sem sinais de peritonismo. Ruídos hidroaéreos presentes e normais.\nExame dirigido para ${motivo}: [descrever achados relevantes]. Sem alterações agudas no momento.`;
+};
+
 const COMORBIDADES = [
   { id: "has", label: "Hipertensão Arterial Sistêmica (HAS)" },
   { id: "dm", label: "Diabetes Mellitus (DM)" },
@@ -1640,13 +1792,32 @@ CRM-SP 58120`;
 
             {/* Exame Físico */}
             <div className="space-y-1">
-              <Label>Exame Físico</Label>
+              <div className="flex items-center justify-between">
+                <Label>Exame Físico</Label>
+                {form.motivoPrincipal && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="text-teal-700 border-teal-300 hover:bg-teal-50 h-7 px-3 text-xs font-semibold"
+                    onClick={() => set("exame", getExameFisico(form.motivoPrincipal))}
+                  >
+                    <Pill className="w-3 h-3 mr-1" />
+                    Gerar exame físico
+                  </Button>
+                )}
+              </div>
               <Textarea
                 placeholder="Descreva os achados do exame físico..."
-                rows={4}
+                rows={5}
                 value={form.exame}
                 onChange={(e) => set("exame", e.target.value)}
               />
+              {form.exame && (
+                <p className="text-xs text-gray-400">
+                  Revise e personalize os campos entre colchetes [ ] com os dados do paciente.
+                </p>
+              )}
             </div>
 
             {/* Conduta */}
