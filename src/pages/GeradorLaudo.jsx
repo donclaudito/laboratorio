@@ -914,6 +914,176 @@ const getExameFisico = (motivo) => {
   return `Bom estado geral, corado, hidratado, afebril. PA: [X] mmHg. FC: [X] bpm. Peso: [X] kg.\nAbdômen [plano/globoso], flácido, sem visceromegalias, sem sinais de peritonismo. Ruídos hidroaéreos presentes e normais.\nExame dirigido para ${motivo}: [descrever achados relevantes]. Sem alterações agudas no momento.`;
 };
 
+// ── CID-10 por motivo ──────────────────────────────────────────────────────
+const CID_POR_MOTIVO = {
+  "Hérnia Inguinal Direita": "K40.2", "Hérnia Inguinal Esquerda": "K40.2",
+  "Hérnia Inguinal Bilateral": "K40.2", "Hérnia Inguinal Direita Recidivada": "K40.1",
+  "Hérnia Inguinal Esquerda Recidivada": "K40.1", "Hérnia Inguinal Bilateral Recidivada": "K40.1",
+  "Hérnia Crural Direita": "K41.2", "Hérnia Crural Esquerda": "K41.2",
+  "Hérnia Crural Bilateral": "K41.2", "Hérnia Umbilical": "K42.9",
+  "Hérnia Umbilical Recidivada": "K42.9", "Hérnia Epigástrica": "K43.9",
+  "Hérnia Epigástrica Recidivada": "K43.9", "Hérnia Incisional": "K43.2",
+  "Hérnia Incisional Recidivada": "K43.2", "Hérnia de Spiegel": "K43.9",
+  "Hérnia Lombar": "K43.9", "Hérnia Obturadora": "K45.8",
+  "Hérnia Paraesofágica / Hiatal": "K44.9", "Diástase dos Retos Abdominais": "K66.8",
+  "Colelitíase / Colecistite Crônica Calculosa": "K80.2",
+  "Colecistite Aguda (eletiva após resolução)": "K81.0",
+  "Coledocolitíase": "K80.5", "Pólipo de Vesícula Biliar": "K82.8",
+  "Colangite Crônica": "K83.0",
+  "Doença do Refluxo Gastroesofágico (DRGE) — Fundoplicatura": "K21.0",
+  "Hérnia Hiatal Mista / Paraesofágica": "K44.9",
+  "Acalasia de Esôfago": "K22.0", "Divertículo de Zenker": "K22.5",
+  "Úlcera Péptica Gástrica Refratária": "K25.9", "Úlcera Péptica Duodenal Refratária": "K26.9",
+  "Tumor Benigno Gástrico (GIST / Leiomioma)": "D13.1",
+  "Aderências / Bridas Intestinais (cirurgia eletiva)": "K56.5",
+  "Doença de Crohn — Ressecção Eletiva": "K50.9",
+  "Divertículo de Meckel Sintomático": "Q43.0",
+  "Doença Diverticular do Cólon Sintomática": "K57.3",
+  "Megacólon Chagásico": "K59.3", "Constipação Crônica de Causa Colônica": "K59.0",
+  "Colite Ulcerativa — Cirurgia Eletiva": "K51.9",
+  "Doença de Crohn Colônica — Cirurgia Eletiva": "K50.1",
+  "Prolapso Retal": "K62.3", "Retocele Sintomática": "N81.6",
+  "Hemorróidas Grau III / IV": "K64.2",
+  "Fissura Anal Crônica": "K60.1",
+  "Fístula Perianal (transesfincteriana / supraesfincteriana)": "K60.3",
+  "Fístula Perianal Baixa (interesfincteriana / submucosa)": "K60.3",
+  "Abscesso Anorretal Recorrente": "K61.0",
+  "Cisto Pilonidal / Seio Pilonidal": "L05.9",
+  "Condiloma Acuminado Perianal (extenso)": "A63.0",
+  "Incontinência Fecal — Esfincteroplastia Eletiva": "R15",
+  "Hidradenite Supurativa Perianal": "L73.2",
+  "Cisto Hepático Simples Sintomático": "K76.8",
+  "Cisto Hidático Hepático": "B67.0", "Hepatolitíase": "K80.8",
+  "Hemangioma Hepático Sintomático": "D18.0", "Adenoma Hepático": "D13.4",
+  "Pseudocisto Pancreático Sintomático": "K86.3",
+  "Cistoadenoma Seroso / Mucinoso do Pâncreas": "D13.6",
+  "Esplenomegalia — Esplenectomia Eletiva": "D73.1",
+  "Bócio Nodular — Tireoidectomia Parcial / Total": "E04.2",
+  "Nódulo de Tireoide Indeterminado (Bethesda III / IV)": "E04.1",
+  "Hipertireoidismo Refratário ao Tratamento Clínico": "E05.0",
+  "Hiperparatireoidismo Primário — Paratireoidectomia": "E21.0",
+  "Adenoma de Paratireoide": "D35.1",
+  "Fibroadenoma de Mama": "D24", "Tumor Filodes Benigno de Mama": "D48.6",
+  "Ginecomastia": "N62", "Abscesso Mamário Recorrente / Fístula de Ducto": "N61",
+  "Cisto Sebáceo / Epidérmico": "L72.1", "Lipoma": "D17.9",
+  "Fibroma / Dermatofibroma": "D21.9",
+  "Nevo Melanocítico — Exérese Eletiva": "D22.9",
+  "Carcinoma Basocelular / Espinocelular (ressecção eletiva)": "C44.9",
+  "Cirurgia Ambulatorial Dermatológica Geral": "L98.9",
+};
+
+// ── Exames pré-op padrão e por grupo ──────────────────────────────────────
+const PREOP_PADRAO = `• Hemograma completo
+• Coagulograma (TAP, PTTa, fibrinogênio)
+• Tipo sanguíneo e fator Rh
+• Glicemia em jejum
+• Ureia e creatinina
+• Sódio e Potássio
+• TGO (AST) / TGP (ALT)
+• Bilirrubinas Total e Frações
+• HIV 1 e 2 (consentido)
+• HBsAg e Anti-HBs (Hepatite B)
+• Anti-HCV (Hepatite C)
+• VDRL (Sífilis)
+• Eletrocardiograma (ECG)
+• Raio-X de Tórax PA e Perfil`;
+
+const PREOP_EXTRA = {
+  vesicula: `• GGT (Gama-Glutamil Transferase)
+• Fosfatase Alcalina
+• Amilase e Lipase
+• Ultrassonografia abdominal total (recente)`,
+  tireoide: `• TSH e T4 Livre
+• Ultrassonografia cervical (recente)
+• Laringoscopia indireta pré-operatória`,
+  colorretal: `• Albumina e Proteínas Totais
+• CEA (se neoplasia)
+• Colonoscopia recente (< 1 ano)
+• TC de abdômen e pelve com contraste`,
+  esofago: `• Endoscopia digestiva alta recente
+• Esofagograma baritado
+• pH-metria de 24h (se DRGE)`,
+  mama: `• Mamografia bilateral
+• Ultrassonografia mamária bilateral
+• Resultado de biópsia / PAAF`,
+  paratireoide: `• Cálcio iônico e total
+• PTH intacto
+• Cintilografia de paratireoides (MIBI)
+• Densitometria óssea`,
+  pancreas: `• Amilase e Lipase
+• CA 19-9 (se neoplasia)
+• TC de abdômen com contraste (protocolo pancreático)`,
+};
+
+const getPreop = (motivo) => {
+  const m = motivo.toLowerCase();
+  let extra = "";
+  if (m.includes("vesícula") || m.includes("colecist") || m.includes("coledoc") || m.includes("colangite") || m.includes("pólipo de vesícula")) extra = PREOP_EXTRA.vesicula;
+  else if (m.includes("tireoide") || m.includes("bócio") || m.includes("nódulo de tireoide") || m.includes("hipertireoidismo")) extra = PREOP_EXTRA.tireoide;
+  else if (m.includes("paratireoide") || m.includes("hiperparatireoidismo") || m.includes("adenoma de paratireoide")) extra = PREOP_EXTRA.paratireoide;
+  else if (m.includes("cólon") || m.includes("colite") || m.includes("crohn colônica") || m.includes("megacólon") || m.includes("sigmoidectomia") || m.includes("colectomia") || m.includes("diverticular")) extra = PREOP_EXTRA.colorretal;
+  else if (m.includes("esôfago") || m.includes("refluxo") || m.includes("hiatal") || m.includes("acalasia") || m.includes("divertículo de zenker")) extra = PREOP_EXTRA.esofago;
+  else if (m.includes("mama") || m.includes("fibroadenoma") || m.includes("ginecomastia")) extra = PREOP_EXTRA.mama;
+  else if (m.includes("pâncreas") || m.includes("pancreát") || m.includes("pseudocisto") || m.includes("cistoadenoma")) extra = PREOP_EXTRA.pancreas;
+  return extra ? `${PREOP_PADRAO}\n${extra}` : PREOP_PADRAO;
+};
+
+const CONDUTA_POR_MOTIVO = {};  // Específicas (override) — opcional
+
+const getConduta = (motivo, procedimento) => {
+  if (CONDUTA_POR_MOTIVO[motivo]) return CONDUTA_POR_MOTIVO[motivo];
+  const proc = (procedimento === "__custom__" ? "" : procedimento) || "[procedimento a definir]";
+  const cid = CID_POR_MOTIVO[motivo] || "[CID]";
+  const preop = getPreop(motivo);
+  return `━━━━━━━━━━━━━━━━━━━━━━━━
+1. INDICAÇÃO CIRÚRGICA
+━━━━━━━━━━━━━━━━━━━━━━━━
+Paciente com diagnóstico de ${motivo} (CID-10: ${cid}), com indicação de tratamento cirúrgico eletivo.
+Procedimento proposto: ${proc}.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+2. EXAMES PRÉ-OPERATÓRIOS
+━━━━━━━━━━━━━━━━━━━━━━━━
+${preop}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+3. AVALIAÇÕES PRÉ-OPERATÓRIAS
+━━━━━━━━━━━━━━━━━━━━━━━━
+• Avaliação pré-anestésica obrigatória
+• Avaliação cardiológica (se > 40 anos, cardiopata ou ECG alterado)
+• Avaliação pneumológica (se pneumopata, tabagista ou Rx de tórax alterado)
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+4. SOLICITAÇÃO DE AIH
+━━━━━━━━━━━━━━━━━━━━━━━━
+Solicitar Autorização de Internação Hospitalar (AIH) para realização de:
+Procedimento: ${proc}
+Diagnóstico Principal (CID-10): ${cid}
+Caráter: Eletivo
+Médico Solicitante: Dr. Claudio M Orenstein — CRM-SP 58120
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+5. TERMO DE CONSENTIMENTO INFORMADO
+━━━━━━━━━━━━━━━━━━━━━━━━
+Paciente orientado(a) sobre:
+• Natureza do procedimento: ${proc}
+• Riscos cirúrgicos gerais: sangramento, infecção, trombose venosa profunda, lesão de estruturas adjacentes, complicações anestésicas
+• Riscos específicos do procedimento: [descrever]
+• Alternativas de tratamento disponíveis
+• Possibilidade de conversão para cirurgia aberta (se laparoscópica)
+Termo de Consentimento Informado assinado pelo(a) paciente / responsável legal e arquivado em prontuário.
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+6. ORIENTAÇÕES AO PACIENTE
+━━━━━━━━━━━━━━━━━━━━━━━━
+• Jejum de 8h para sólidos e 2h para líquidos claros no pré-operatório
+• Suspender anticoagulantes / antiagregantes plaquetários conforme orientação do anestesista
+• Manter medicações de uso contínuo (HAS, DM) com mínimo de água no dia da cirurgia, salvo orientação contrária
+• Banho com sabão antisséptico (clorexidina) na noite anterior e na manhã da cirurgia
+• Trazer todos os exames e documentos no dia da internação
+• Retornar a este consultório com todos os exames pré-operatórios para liberação cirúrgica`;
+};
+
 const COMORBIDADES = [
   { id: "has", label: "Hipertensão Arterial Sistêmica (HAS)" },
   { id: "dm", label: "Diabetes Mellitus (DM)" },
@@ -1822,13 +1992,37 @@ CRM-SP 58120`;
 
             {/* Conduta */}
             <div className="space-y-1">
-              <Label>Conduta / Recomendações</Label>
+              <div className="flex items-center justify-between">
+                <Label>Conduta / Recomendações</Label>
+                {form.motivoPrincipal && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="text-teal-700 border-teal-300 hover:bg-teal-50 h-7 px-3 text-xs font-semibold"
+                    onClick={() => {
+                      const proc = form.procedimento === "__custom__"
+                        ? form.procedimentoCustom
+                        : form.procedimento;
+                      set("conduta", getConduta(form.motivoPrincipal, proc));
+                    }}
+                  >
+                    <Pill className="w-3 h-3 mr-1" />
+                    Gerar conduta
+                  </Button>
+                )}
+              </div>
               <Textarea
                 placeholder="Descreva a conduta proposta e orientações..."
-                rows={3}
+                rows={8}
                 value={form.conduta}
                 onChange={(e) => set("conduta", e.target.value)}
               />
+              {form.conduta && (
+                <p className="text-xs text-gray-400">
+                  Revise e personalize os campos entre colchetes [ ] com os dados do paciente.
+                </p>
+              )}
             </div>
 
             {/* Ações */}
