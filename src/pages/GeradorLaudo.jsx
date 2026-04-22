@@ -1562,13 +1562,37 @@ CRM-SP 58120`;
 
             {/* Anamnese */}
             <div className="space-y-1">
-              <Label>Anamnese / Queixa Principal</Label>
+              <div className="flex items-center justify-between">
+                <Label>Anamnese / Queixa Principal</Label>
+                {form.motivoPrincipal && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="text-teal-700 border-teal-300 hover:bg-teal-50 h-7 px-3 text-xs font-semibold"
+                    onClick={() => {
+                      const proc = form.procedimento === "__custom__"
+                        ? form.procedimentoCustom
+                        : form.procedimento;
+                      set("anamnese", getAnamnese(form.motivoPrincipal, proc));
+                    }}
+                  >
+                    <Pill className="w-3 h-3 mr-1" />
+                    Gerar anamnese
+                  </Button>
+                )}
+              </div>
               <Textarea
                 placeholder="Descreva a queixa principal e histórico clínico..."
-                rows={4}
+                rows={5}
                 value={form.anamnese}
                 onChange={(e) => set("anamnese", e.target.value)}
               />
+              {form.anamnese && (
+                <p className="text-xs text-gray-400">
+                  Revise e personalize os campos entre colchetes [ ] com os dados do paciente.
+                </p>
+              )}
             </div>
 
             {/* Comorbidades */}
