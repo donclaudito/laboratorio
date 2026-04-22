@@ -1028,6 +1028,194 @@ const getPreop = (motivo) => {
   return extra ? `${PREOP_PADRAO}\n${extra}` : PREOP_PADRAO;
 };
 
+// ──────────────────────────────────────────────
+// EXAMES DE IMAGEM SUGERIDOS POR MOTIVO
+// ──────────────────────────────────────────────
+const getImagensSugeridas = (motivo) => {
+  const m = motivo.toLowerCase();
+
+  // Hérnias da parede abdominal
+  if (m.includes("hérnia inguinal") || m.includes("hérnia crural"))
+    return [
+      "USG de parede abdominal (canal inguinal) — dinâmico",
+      "TC de abdômen e pelve sem contraste (hérnias complexas / recidivadas)",
+    ];
+  if (m.includes("hérnia umbilical") || m.includes("hérnia epigástrica") || m.includes("hérnia incisional") || m.includes("diástase"))
+    return [
+      "USG de parede abdominal — avaliação de defeito e conteúdo",
+      "TC de abdômen sem contraste — mapeamento do defeito e relação com estruturas",
+    ];
+  if (m.includes("hérnia de spiegel") || m.includes("hérnia lombar") || m.includes("hérnia obturadora"))
+    return [
+      "TC de abdômen e pelve sem contraste — identificação e dimensionamento do defeito",
+      "USG de parede abdominal dinâmico (Valsalva)",
+    ];
+  if (m.includes("hiatal") || m.includes("paraesofágica"))
+    return [
+      "Esofagograma baritado (trânsito esofagogastroduodenal — SEED)",
+      "Endoscopia digestiva alta (EDA) — avaliação de mucosa e hérnia",
+      "TC de tórax e abdômen superior",
+    ];
+
+  // Vesícula e vias biliares
+  if (m.includes("colelitíase") || m.includes("colecistite") || m.includes("pólipo de vesícula"))
+    return [
+      "USG de abdome total (vesícula e vias biliares)",
+      "TC de abdômen superior (avaliação de complicações / coleções)",
+    ];
+  if (m.includes("coledocolitíase") || m.includes("colangite"))
+    return [
+      "USG de abdome total",
+      "Colangiorressonância (RM de vias biliares — CPRM)",
+      "TC de abdômen superior com contraste",
+    ];
+
+  // Esôfago e estômago
+  if (m.includes("refluxo") || m.includes("drge") || m.includes("fundoplicatura"))
+    return [
+      "Endoscopia digestiva alta (EDA)",
+      "PHmetria esofágica de 24h + manometria esofágica",
+      "Esofagograma baritado (trânsito esofagogastroduodenal)",
+    ];
+  if (m.includes("acalasia"))
+    return [
+      "Esofagograma baritado",
+      "Manometria esofágica de alta resolução",
+      "Endoscopia digestiva alta (EDA)",
+      "TC de tórax",
+    ];
+  if (m.includes("divertículo de zenker") || m.includes("divertículo esofágico"))
+    return [
+      "Esofagograma baritado",
+      "TC de tórax e pescoço",
+      "Endoscopia digestiva alta (EDA)",
+    ];
+  if (m.includes("úlcera péptica") || m.includes("estenose pilórica") || m.includes("tumor benigno gástrico") || m.includes("gist"))
+    return [
+      "Endoscopia digestiva alta (EDA) com biópsia",
+      "TC de abdômen e pelve com contraste",
+    ];
+
+  // Intestino delgado
+  if (m.includes("aderências") || m.includes("bridas"))
+    return [
+      "TC de abdômen e pelve com contraste — avaliação de aderências e trânsito",
+      "Raio-X simples de abdômen (série)",
+    ];
+  if (m.includes("doença de crohn") || m.includes("fístula enterocutânea"))
+    return [
+      "TC de abdômen e pelve com contraste (enterografia)",
+      "RM de abdômen e pelve (enterografia por RM)",
+      "Colonoscopia com ileoscopia",
+    ];
+  if (m.includes("divertículo de meckel"))
+    return [
+      "Cintilografia com tecnécio-99m (pesquisa de mucosa gástrica ectópica)",
+      "TC de abdômen com contraste",
+    ];
+
+  // Cólon e reto
+  if (m.includes("diverticular") || m.includes("megacólon") || m.includes("constipação") || m.includes("colite"))
+    return [
+      "Colonoscopia",
+      "TC de abdômen e pelve com contraste",
+    ];
+  if (m.includes("pólipo colônico"))
+    return [
+      "Colonoscopia com polipectomia (prévia ou diagnóstica)",
+      "TC de abdômen e pelve",
+    ];
+  if (m.includes("prolapso retal") || m.includes("retocele") || m.includes("estenose retal"))
+    return [
+      "RM de pelve (avaliação de assoalho pélvico)",
+      "Colonoscopia",
+      "Defecografia (RM ou convencional)",
+    ];
+
+  // Anorretal e períneo
+  if (m.includes("fístula perianal"))
+    return [
+      "RM de pelve com protocolo para fístula anal",
+      "USG endorretal (transanal) 3D",
+    ];
+  if (m.includes("hemorróida") || m.includes("fissura anal") || m.includes("abscesso anorretal") || m.includes("cisto pilonidal") || m.includes("hidradenite") || m.includes("condiloma"))
+    return [
+      "Colonoscopia (rastreamento, se indicado)",
+    ];
+  if (m.includes("incontinência fecal"))
+    return [
+      "USG endorretal 3D (avaliação do esfíncter anal)",
+      "RM de pelve",
+      "Manometria anorretal",
+    ];
+
+  // Fígado, pâncreas, baço
+  if (m.includes("cisto hepático") || m.includes("cisto hidático") || m.includes("hemangioma hepático") || m.includes("adenoma hepático") || m.includes("hepatolitíase"))
+    return [
+      "USG abdome total",
+      "TC de abdômen com contraste (trifásico)",
+      "RM de abdômen superior com contraste",
+    ];
+  if (m.includes("hipertensão portal"))
+    return [
+      "USG abdome com Doppler portal",
+      "TC de abdômen com contraste",
+      "Endoscopia digestiva alta (EDA) — varizes",
+    ];
+  if (m.includes("pancreatite crônica") || m.includes("pseudocisto pancreático") || m.includes("cistoadenoma"))
+    return [
+      "TC de abdômen com contraste (protocolo pâncreas)",
+      "RM de abdômen / Colangiorressonância (CPRM)",
+      "Endoscopia digestiva alta (EDA)",
+    ];
+  if (m.includes("esplenomegalia") || m.includes("cisto esplênico"))
+    return [
+      "USG abdome total",
+      "TC de abdômen com contraste",
+    ];
+
+  // Tireoide e paratireoide
+  if (m.includes("tireoide") || m.includes("tireoidectomia") || m.includes("bócio") || m.includes("nódulo de tireoide") || m.includes("hipertireoidismo"))
+    return [
+      "USG de tireoide com Doppler",
+      "Cintilografia de tireoide (Tc-99m)",
+      "TC de pescoço sem contraste (bócio mergulhante)",
+    ];
+  if (m.includes("paratireoide") || m.includes("hiperparatireoidismo") || m.includes("adenoma de paratireoide"))
+    return [
+      "USG de região cervical (tireoide e paratireoide)",
+      "Cintilografia com Sestamibi (MIBI) — paratireoide",
+      "TC de pescoço e mediastino sem contraste",
+      "RM de pescoço",
+    ];
+
+  // Parede torácica e mediastino
+  if (m.includes("empiema") || m.includes("cisto mediastinal") || m.includes("tumor de parede torácica"))
+    return [
+      "TC de tórax com contraste",
+      "Raio-X de tórax (PA e perfil)",
+    ];
+
+  // Mama
+  if (m.includes("mama") || m.includes("fibroadenoma") || m.includes("tumor filodes") || m.includes("ginecomastia") || m.includes("cisto mamário") || m.includes("abscesso mamário"))
+    return [
+      "USG de mamas",
+      "Mamografia bilateral (BI-RADS)",
+      "RM de mamas com contraste (lesões complexas / indeterminadas)",
+    ];
+
+  // Partes moles / dermatologia
+  if (m.includes("cisto sebáceo") || m.includes("lipoma") || m.includes("fibroma") || m.includes("nevo") || m.includes("granuloma") || m.includes("queratose") || m.includes("carcinoma basocelular") || m.includes("carcinoma espinocelular"))
+    return [
+      "USG de partes moles (avaliação de lesão e profundidade)",
+    ];
+
+  return [
+    "USG abdome total",
+    "TC de abdômen e pelve com contraste (se indicado)",
+  ];
+};
+
 const CONDUTA_POR_MOTIVO = {};  // Específicas (override) — opcional
 
 const getConduta = (motivo, procedimento) => {
@@ -1555,6 +1743,7 @@ export default function GeradorLaudo() {
     medicacoes: "",
     conduta: "",
     comorbidades: {},
+    imagensAnexadas: [],
   });
 
   const [outputs, setOutputs] = useState(null);
@@ -1617,6 +1806,9 @@ export default function GeradorLaudo() {
     const alergias = form.alergias || "Nega";
     const medicacoes = form.medicacoes || "Nega uso de medicações";
     const conduta = form.conduta || "[conduta não informada]";
+    const imagensText = form.imagensAnexadas.length > 0
+      ? form.imagensAnexadas.map((i) => `• ${i}`).join("\n")
+      : "Nenhum exame de imagem anexado";
 
     const laudo = `LAUDO DE CONSULTA CIRÚRGICA
 Data: ${hoje}
@@ -1628,6 +1820,10 @@ ${motivo}${associado}
 
 PROCEDIMENTO PROPOSTO
 ${procedimento}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EXAMES DE IMAGEM ANEXADOS PELO PACIENTE
+${imagensText}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ANAMNESE / QUEIXA PRINCIPAL
@@ -2024,6 +2220,46 @@ CRM-SP 58120`;
                 </p>
               )}
             </div>
+
+            {/* Exames de Imagem Anexados */}
+            {form.motivoPrincipal && (
+              <div className="space-y-2">
+                <Label>Exames de Imagem Anexados pelo Paciente</Label>
+                <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-2">
+                  {getImagensSugeridas(form.motivoPrincipal).map((exameImg) => {
+                    const checked = form.imagensAnexadas.includes(exameImg);
+                    return (
+                      <div key={exameImg} className="flex items-start gap-2">
+                        <Checkbox
+                          id={`img-${exameImg}`}
+                          checked={checked}
+                          onCheckedChange={(val) =>
+                            set(
+                              "imagensAnexadas",
+                              val
+                                ? [...form.imagensAnexadas, exameImg]
+                                : form.imagensAnexadas.filter((x) => x !== exameImg)
+                            )
+                          }
+                          className="mt-0.5"
+                        />
+                        <label
+                          htmlFor={`img-${exameImg}`}
+                          className="text-sm text-gray-700 cursor-pointer leading-snug"
+                        >
+                          {exameImg}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+                {form.imagensAnexadas.length > 0 && (
+                  <p className="text-xs text-emerald-600 font-medium">
+                    {form.imagensAnexadas.length} exame(s) marcado(s) como anexado(s).
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Ações */}
             <div className="flex flex-wrap gap-3 pt-4 border-t">
