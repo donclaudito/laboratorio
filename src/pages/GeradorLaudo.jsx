@@ -190,6 +190,578 @@ const MOTIVOS_GRUPOS = [
 // Lista plana para compatibilidade com o campo de texto gerado
 const MOTIVOS = MOTIVOS_GRUPOS.flatMap((g) => g.opcoes);
 
+const PROCEDIMENTOS_POR_MOTIVO = {
+  "Hérnia Inguinal Direita": [
+    "Herniorrafia inguinal direita com tela — técnica de Lichtenstein (aberta)",
+    "Herniorrafia inguinal direita laparoscópica — TAPP (transabdominal pré-peritoneal)",
+    "Herniorrafia inguinal direita laparoscópica — TEP (totalmente extraperitoneal)",
+    "Herniorrafia inguinal direita robótica (TAPP robótico)",
+    "Herniorrafia inguinal direita sem tela — técnica de Shouldice (aberta)",
+  ],
+  "Hérnia Inguinal Esquerda": [
+    "Herniorrafia inguinal esquerda com tela — técnica de Lichtenstein (aberta)",
+    "Herniorrafia inguinal esquerda laparoscópica — TAPP",
+    "Herniorrafia inguinal esquerda laparoscópica — TEP",
+    "Herniorrafia inguinal esquerda robótica (TAPP robótico)",
+    "Herniorrafia inguinal esquerda sem tela — técnica de Shouldice",
+  ],
+  "Hérnia Inguinal Bilateral": [
+    "Herniorrafia inguinal bilateral com tela — técnica de Lichtenstein bilateral (aberta)",
+    "Herniorrafia inguinal bilateral laparoscópica — TAPP bilateral",
+    "Herniorrafia inguinal bilateral laparoscópica — TEP bilateral",
+    "Herniorrafia inguinal bilateral robótica",
+  ],
+  "Hérnia Inguinal Direita Recidivada": [
+    "Herniorrafia inguinal direita recidivada — TAPP laparoscópico (acesso pré-peritoneal)",
+    "Herniorrafia inguinal direita recidivada — TEP laparoscópico",
+    "Herniorrafia inguinal direita recidivada com tela — abordagem pré-peritoneal aberta (Stoppa / Kugel)",
+    "Herniorrafia inguinal direita recidivada robótica",
+  ],
+  "Hérnia Inguinal Esquerda Recidivada": [
+    "Herniorrafia inguinal esquerda recidivada — TAPP laparoscópico",
+    "Herniorrafia inguinal esquerda recidivada — TEP laparoscópico",
+    "Herniorrafia inguinal esquerda recidivada com tela — abordagem pré-peritoneal aberta",
+    "Herniorrafia inguinal esquerda recidivada robótica",
+  ],
+  "Hérnia Inguinal Bilateral Recidivada": [
+    "Herniorrafia inguinal bilateral recidivada — TAPP bilateral laparoscópico",
+    "Herniorrafia inguinal bilateral recidivada — TEP bilateral",
+    "Herniorrafia inguinal bilateral recidivada robótica",
+  ],
+  "Hérnia Crural Direita": [
+    "Herniorrafia crural direita com tela — acesso inguinal (aberta)",
+    "Herniorrafia crural direita laparoscópica — TAPP",
+    "Herniorrafia crural direita — acesso pré-peritoneal (Nyhus / Stoppa)",
+  ],
+  "Hérnia Crural Esquerda": [
+    "Herniorrafia crural esquerda com tela — acesso inguinal (aberta)",
+    "Herniorrafia crural esquerda laparoscópica — TAPP",
+    "Herniorrafia crural esquerda — acesso pré-peritoneal (Nyhus / Stoppa)",
+  ],
+  "Hérnia Crural Bilateral": [
+    "Herniorrafia crural bilateral com tela — aberta bilateral",
+    "Herniorrafia crural bilateral laparoscópica — TAPP bilateral",
+  ],
+  "Hérnia Umbilical": [
+    "Herniorrafia umbilical com tela (aberta — Mayo modificado com tela)",
+    "Herniorrafia umbilical laparoscópica — IPOM (intraperitoneal onlay mesh)",
+    "Herniorrafia umbilical robótica",
+    "Herniorrafia umbilical sutura primária — defeito < 2 cm (sem tela)",
+  ],
+  "Hérnia Umbilical Recidivada": [
+    "Herniorrafia umbilical recidivada com tela — IPOM laparoscópico",
+    "Herniorrafia umbilical recidivada — IPOM robótico",
+    "Herniorrafia umbilical recidivada aberta com tela pré-peritoneal",
+  ],
+  "Hérnia Epigástrica": [
+    "Herniorrafia epigástrica com tela (aberta)",
+    "Herniorrafia epigástrica laparoscópica — IPOM",
+    "Herniorrafia epigástrica sutura primária — defeito pequeno",
+  ],
+  "Hérnia Epigástrica Recidivada": [
+    "Herniorrafia epigástrica recidivada com tela — IPOM laparoscópico",
+    "Herniorrafia epigástrica recidivada aberta com tela",
+  ],
+  "Hérnia Incisional": [
+    "Hernioplastia incisional com tela — IPOM laparoscópico",
+    "Hernioplastia incisional com tela — IPOM robótico",
+    "Hernioplastia incisional aberta com tela (onlay / sublay / inlay)",
+    "Hernioplastia incisional com tela — eTEP (extraperitoneal endoscópico)",
+    "Hernioplastia incisional com separação de componentes (técnica de Ramirez)",
+  ],
+  "Hérnia Incisional Recidivada": [
+    "Hernioplastia incisional recidivada — IPOM laparoscópico",
+    "Hernioplastia incisional recidivada — IPOM robótico",
+    "Hernioplastia incisional recidivada com separação de componentes",
+  ],
+  "Hérnia de Spiegel": [
+    "Herniorrafia de Spiegel com tela — laparoscópica (IPOM / TAPP)",
+    "Herniorrafia de Spiegel com tela — aberta",
+  ],
+  "Hérnia Lombar": [
+    "Herniorrafia lombar com tela — laparoscópica",
+    "Herniorrafia lombar com tela — aberta",
+  ],
+  "Hérnia Obturadora": [
+    "Herniorrafia obturadora laparoscópica — TAPP",
+    "Herniorrafia obturadora aberta — acesso inguinal ou extraperitoneal",
+  ],
+  "Hérnia Paraesofágica / Hiatal": [
+    "Correção de hérnia hiatal paraesofágica por videolaparoscopia com fundoplicatura de Nissen (360°)",
+    "Correção de hérnia hiatal paraesofágica por videolaparoscopia com fundoplicatura de Toupet (270°)",
+    "Correção de hérnia hiatal por videolaparoscopia com fundoplicatura de Dor (180° anterior)",
+    "Correção de hérnia hiatal robótica com fundoplicatura",
+  ],
+  "Diástase dos Retos Abdominais": [
+    "Correção de diástase dos retos abdominais com plicatura de bainha anterior e tela (aberta)",
+    "Correção de diástase dos retos abdominais laparoscópica com tela (eTEP / MILOS)",
+    "Correção de diástase dos retos abdominais robótica com tela",
+  ],
+  "Colelitíase / Colecistite Crônica Calculosa": [
+    "Colecistectomia videolaparoscópica eletiva",
+    "Colecistectomia robótica eletiva",
+    "Colecistectomia aberta (laparotomia subcostal direita)",
+    "Colecistectomia laparoscópica com colangiografia intraoperatória",
+  ],
+  "Colecistite Aguda (eletiva após resolução)": [
+    "Colecistectomia videolaparoscópica eletiva (6–8 semanas após resolução)",
+    "Colecistectomia aberta eletiva",
+  ],
+  "Coledocolitíase": [
+    "CPRE (colangiopancreatografia retrógrada endoscópica) + colecistectomia laparoscópica",
+    "Colecistectomia laparoscópica com exploração laparoscópica do colédoco",
+    "Colecistectomia aberta com coledocolitotomia e drenagem em T",
+  ],
+  "Pólipo de Vesícula Biliar": [
+    "Colecistectomia videolaparoscópica (pólipo ≥ 10 mm ou crescimento progressivo)",
+    "Colecistectomia aberta (suspeita de malignidade)",
+  ],
+  "Colangite Crônica": [
+    "Colecistectomia videolaparoscópica com exploração das vias biliares",
+    "Colecistectomia aberta com coledocolitotomia",
+  ],
+  "Doença do Refluxo Gastroesofágico (DRGE) — Fundoplicatura": [
+    "Fundoplicatura à Nissen (360°) por videolaparoscopia",
+    "Fundoplicatura de Toupet (270° posterior) por videolaparoscopia",
+    "Fundoplicatura de Dor (180° anterior) por videolaparoscopia",
+    "Fundoplicatura robótica (Nissen / Toupet)",
+    "Fundoplicatura com correção de hérnia hiatal associada",
+  ],
+  "Hérnia Hiatal Mista / Paraesofágica": [
+    "Correção de hérnia hiatal mista com fundoplicatura de Nissen — videolaparoscopia",
+    "Correção de hérnia hiatal mista com fundoplicatura de Toupet — videolaparoscopia",
+    "Correção de hérnia hiatal robótica com fundoplicatura",
+  ],
+  "Acalasia de Esôfago": [
+    "Cardiomiotomia de Heller com fundoplicatura parcial — videolaparoscopia",
+    "Cardiomiotomia de Heller robótica com fundoplicatura parcial",
+    "POEM (miotomia endoscópica oral por via endoscópica)",
+  ],
+  "Divertículo de Zenker": [
+    "Diverticulotomia endoscópica de Zenker (diverticuloscópio / stapler endoscópico)",
+    "Diverticulectomia de Zenker cirúrgica (acesso cervical com miotomia do cricofaríngeo)",
+  ],
+  "Divertículo Esofágico de Tração": [
+    "Diverticulectomia esofágica por toracoscopia (VATS)",
+    "Diverticulectomia esofágica por toracotomia aberta",
+  ],
+  "Úlcera Péptica Gástrica Refratária": [
+    "Gastrectomia parcial com reconstrução Billroth I (gastroduodenostomia)",
+    "Gastrectomia parcial com reconstrução Billroth II (gastrojejunostomia)",
+    "Gastrectomia parcial com reconstrução em Y de Roux",
+    "Gastrectomia parcial laparoscópica",
+  ],
+  "Úlcera Péptica Duodenal Refratária": [
+    "Vagotomia troncular com piloroplastia (Heineke-Mikulicz)",
+    "Vagotomia superseletiva (células parietais)",
+    "Antrectomia com vagotomia e reconstrução Billroth I / II",
+    "Abordagem laparoscópica (vagotomia / antrectomia)",
+  ],
+  "Tumor Benigno Gástrico (GIST / Leiomioma)": [
+    "Gastrectomia parcial laparoscópica com ressecção em cunha",
+    "Gastrectomia parcial aberta com ressecção em cunha",
+    "Ressecção intragástrica laparoscópica (lesões submucosas intraluminais)",
+  ],
+  "Estenose Pilórica do Adulto": [
+    "Piloroplastia laparoscópica (Heineke-Mikulicz)",
+    "Gastrectomia parcial distal laparoscópica com reconstrução",
+    "Gastrectomia parcial distal aberta",
+  ],
+  "Aderências / Bridas Intestinais (cirurgia eletiva)": [
+    "Lise de aderências intestinais por videolaparoscopia",
+    "Lise de aderências intestinais por laparotomia (relaparotomia)",
+  ],
+  "Tumor Benigno de Intestino Delgado": [
+    "Ressecção segmentar de intestino delgado com anastomose primária — laparoscópica",
+    "Ressecção segmentar de intestino delgado com anastomose primária — aberta",
+  ],
+  "Doença de Crohn — Ressecção Eletiva": [
+    "Ressecção ileocecal laparoscópica com anastomose primária",
+    "Ressecção ileocecal aberta com anastomose primária",
+    "Ressecção segmentar de intestino delgado laparoscópica",
+    "Estricturoplastia (estenose sem massa palpável)",
+  ],
+  "Divertículo de Meckel Sintomático": [
+    "Diverticulectomia de Meckel laparoscópica",
+    "Diverticulectomia de Meckel aberta",
+    "Ressecção segmentar ileal laparoscópica (base larga / suspeita de malignidade)",
+  ],
+  "Fístula Enterocutânea": [
+    "Ressecção do segmento intestinal fistulizado com anastomose primária",
+    "Ressecção com anastomose primária + colostomia de proteção",
+  ],
+  "Doença Diverticular do Cólon Sintomática": [
+    "Sigmoidectomia laparoscópica com anastomose primária colorretal",
+    "Sigmoidectomia robótica com anastomose primária",
+    "Sigmoidectomia aberta com anastomose primária",
+    "Operação de Hartmann laparoscópica (sigmoidectomia + colostomia terminal)",
+  ],
+  "Pólipo Colônico de Grande Volume (não ressecável por colonoscopia)": [
+    "Ressecção colônica segmentar laparoscópica",
+    "Hemicolectomia direita / esquerda laparoscópica conforme localização",
+    "Ressecção colônica segmentar aberta",
+  ],
+  "Megacólon Chagásico": [
+    "Retossigmoidectomia com abaixamento coloanal — técnica de Duhamel-Haddad",
+    "Retossigmoidectomia com abaixamento coloanal — técnica de Swenson",
+    "Coloproctectomia total com anastomose íleo-retal (casos extensos)",
+  ],
+  "Constipação Crônica de Causa Colônica": [
+    "Colectomia total com anastomose íleo-retal laparoscópica",
+    "Colectomia subtotal com anastomose íleo-sigmoide laparoscópica",
+  ],
+  "Colite Ulcerativa — Cirurgia Eletiva": [
+    "Proctocolectomia total com reservatório ileal (bolsa em J — IPAA) laparoscópica",
+    "Proctocolectomia total com ileostomia terminal definitiva laparoscópica",
+    "Colectomia total com ileostomia + segundo tempo (mucosectomia + IPAA)",
+  ],
+  "Doença de Crohn Colônica — Cirurgia Eletiva": [
+    "Hemicolectomia direita laparoscópica",
+    "Hemicolectomia esquerda laparoscópica",
+    "Colectomia segmentar laparoscópica",
+    "Colectomia total laparoscópica",
+  ],
+  "Prolapso Retal": [
+    "Retopexia laparoscópica anterior com tela (técnica de d'Hoore / ventral mesh rectopexy)",
+    "Retopexia laparoscópica posterior (técnica de Wells)",
+    "Retopexia robótica anterior com tela",
+    "Retossigmoidectomia perineal (técnica de Altemeier) — acesso perineal",
+    "Operação de Delorme — acesso perineal",
+  ],
+  "Retocele Sintomática": [
+    "Correção de retocele por via transanal",
+    "Correção de retocele por via transvaginal (colporrafia posterior)",
+    "Correção de retocele laparoscópica com tela (retopexia ventral)",
+  ],
+  "Estenose Retal Benigna": [
+    "Dilatação endoanal progressiva da estenose retal",
+    "Ressecção endoanal da estenose + plastia (avanço de retalho)",
+    "Ressecção transanal endoscópica microcirúrgica (TEM / TAMIS)",
+  ],
+  "Hemorróidas Grau III / IV": [
+    "Hemorroidectomia aberta — técnica de Milligan-Morgan",
+    "Hemorroidectomia fechada — técnica de Ferguson",
+    "Hemorroidopexia com grampeador circular — PPH (procedimento de Longo)",
+    "HAL-RAR (ligadura das artérias hemorroidárias com rafia do prolápso — Doppler-guiada)",
+    "Hemorroidectomia com bisturi harmônico / Ligasure",
+  ],
+  "Fissura Anal Crônica": [
+    "Esfincterotomia interna lateral fechada",
+    "Esfincterotomia interna lateral aberta",
+    "Avanço de retalho cutâneo (casos sem reserva esfinctérica)",
+  ],
+  "Fístula Perianal (transesfincteriana / supraesfincteriana)": [
+    "Colocação de Seton de corte progressivo",
+    "Colocação de Seton dreno (sem corte) + segundo tempo",
+    "LIFT — ligadura interesfincteriana do trato fistuloso",
+    "Avanço de retalho endorretal (endorectal flap advancement)",
+    "Plug de fístula (fistula plug bioprotético)",
+    "Laser de fístula (FiLaC — fistula-tract laser closure)",
+    "VAAFT — cirurgia assistida por vídeo para fístula anorretal",
+  ],
+  "Fístula Perianal Baixa (interesfincteriana / submucosa)": [
+    "Fistulotomia com abertura completa do trato fistuloso",
+    "Fistulectomia com excisão do trato e sutura primária",
+  ],
+  "Abscesso Anorretal Recorrente": [
+    "Drenagem cirúrgica de abscesso anorretal com pesquisa e tratamento de fístula associada",
+    "Drenagem cirúrgica simples de abscesso anorretal",
+  ],
+  "Cisto Pilonidal / Seio Pilonidal": [
+    "Exérese de cisto pilonidal com fechamento primário — técnica de Karydakis",
+    "Exérese de cisto pilonidal com retalho romboide — técnica de Limberg",
+    "Exérese de cisto pilonidal com cicatrização por segunda intenção",
+    "Exérese de cisto pilonidal com sutura primária em linha média",
+    "Sinusectomia de Bascom (curetagem dos óstios)",
+  ],
+  "Condiloma Acuminado Perianal (extenso)": [
+    "Exérese cirúrgica de condiloma acuminado perianal",
+    "Eletrocauterização / coagulação de condiloma perianal",
+    "Laser CO₂ de condiloma acuminado perianal",
+  ],
+  "Incontinência Fecal — Esfincteroplastia Eletiva": [
+    "Esfincteroplastia anal anterior sobreposta (sobreposição muscular)",
+    "Neuromodulação sacral (implante de eletrodo sacral — SNM)",
+    "Esfincteroplastia + graciloplastia dinâmica (casos selecionados)",
+  ],
+  "Hidradenite Supurativa Perianal": [
+    "Exérese ampla de hidradenite supurativa perianal + enxertia de pele",
+    "Exérese ampla + cicatrização por segunda intenção",
+    "Exérese ampla + retalho cutâneo local",
+  ],
+  "Cisto Hepático Simples Sintomático": [
+    "Deroofing laparoscópico de cisto hepático simples",
+    "Deroofing aberto de cisto hepático simples",
+    "Drenagem percutânea com escleroterapia (PAIR — percutaneous aspiration, injection, reaspiration)",
+  ],
+  "Cisto Hidático Hepático": [
+    "Cistopericistecomia hepática laparoscópica",
+    "Cistopericistecomia hepática aberta",
+    "Drenagem percutânea com escleroterapia (PAIR) — pré-operatório ou definitiva",
+  ],
+  "Hepatolitíase": [
+    "Colangioscopia percutânea trans-hepática com litotripsia",
+    "Ressecção hepática segmentar laparoscópica",
+    "Ressecção hepática segmentar aberta",
+  ],
+  "Hemangioma Hepático Sintomático": [
+    "Ressecção hepática laparoscópica (hepatectomia segmentar / enucleação)",
+    "Ressecção hepática aberta (hepatectomia segmentar / enucleação)",
+  ],
+  "Adenoma Hepático": [
+    "Ressecção hepática laparoscópica",
+    "Ressecção hepática aberta",
+    "Embolização arterial transcateter + ressecção diferida (casos selecionados)",
+  ],
+  "Hipertensão Portal — Shunt Cirúrgico Eletivo": [
+    "Shunt esplenorrenal distal de Warren (anastomose esplenorrenal distal)",
+    "Shunt meso-cava com interposição de prótese",
+    "Shunt porto-cava laterolateral",
+    "TIPS (shunt portossistêmico trans-hepático intrajugular) — procedimento radiológico",
+  ],
+  "Pancreatite Crônica — Cirurgia Eletiva (Frey / Puestow / Beger)": [
+    "Procedimento de Frey (ressecção-drenagem da cabeça + pancreatojejunostomia longitudinal)",
+    "Procedimento de Puestow-Gillesby (pancreatojejunostomia longitudinal laterolateral em Y de Roux)",
+    "Procedimento de Beger (duodenopancreatectomia parcial com preservação do duodeno)",
+    "Pancreatectomia distal laparoscópica",
+  ],
+  "Pseudocisto Pancreático Sintomático": [
+    "Cistojejunoanastomose laparoscópica em Y de Roux",
+    "Cistogastroanastomose laparoscópica",
+    "Cistojejunoanastomose aberta em Y de Roux",
+    "Drenagem percutânea guiada por imagem (casos selecionados)",
+    "Drenagem endoscópica trans-mural (ecoendoscopia)",
+  ],
+  "Cistoadenoma Seroso / Mucinoso do Pâncreas": [
+    "Pancreatectomia distal laparoscópica com preservação esplênica (técnica de Warshaw / Kimura)",
+    "Pancreatectomia distal laparoscópica com esplenectomia",
+    "Pancreatectomia distal robótica",
+    "Pancreatectomia distal aberta",
+    "Enucleação laparoscópica (lesões pequenas e periféricas)",
+  ],
+  "Esplenomegalia — Esplenectomia Eletiva": [
+    "Esplenectomia videolaparoscópica eletiva",
+    "Esplenectomia robótica",
+    "Esplenectomia aberta (esplenomegalia volumosa > 20 cm)",
+    "Esplenectomia laparoscópica com preservação de esplenúnculos",
+  ],
+  "Cisto Esplênico Sintomático": [
+    "Esplenectomia laparoscópica",
+    "Marsupialização laparoscópica de cisto esplênico (preservação do baço)",
+    "Ressecção parcial esplênica laparoscópica",
+  ],
+  "Bócio Nodular — Tireoidectomia Parcial / Total": [
+    "Tireoidectomia total (acesso cervical convencional)",
+    "Tireoidectomia total robótica (acesso axilar / BABA)",
+    "Lobectomia tireoidiana com istmectomia (hemitireoidectomia)",
+    "Tireoidectomia total videoassistida (MIVAT — minimally invasive video-assisted)",
+  ],
+  "Nódulo de Tireoide Indeterminado (Bethesda III / IV)": [
+    "Lobectomia tireoidiana com istmectomia (hemitireoidectomia)",
+    "Tireoidectomia total (se fatores de risco elevados ou bilateral)",
+    "Lobectomia robótica (acesso axilar)",
+  ],
+  "Hipertireoidismo Refratário ao Tratamento Clínico": [
+    "Tireoidectomia total (acesso cervical convencional)",
+    "Tireoidectomia total videoassistida (MIVAT)",
+    "Tireoidectomia total robótica",
+  ],
+  "Hiperparatireoidismo Primário — Paratireoidectomia": [
+    "Paratireoidectomia guiada por PTH intraoperatório + cintilografia MIBI (cirurgia minimamente invasiva)",
+    "Paratireoidectomia bilateral com exploração das quatro glândulas",
+    "Paratireoidectomia radioguiada (scintigrafia + sonda gama intraoperatória)",
+  ],
+  "Adenoma de Paratireoide": [
+    "Paratireoidectomia seletiva guiada por PTH intraoperatório",
+    "Paratireoidectomia radioguiada",
+    "Paratireoidectomia bilateral com exploração completa",
+  ],
+  "Empiema Pleural Crônico (decorticação eletiva)": [
+    "Decorticação pleural por videotoracoscopia (VATS)",
+    "Decorticação pleural por toracotomia aberta",
+  ],
+  "Cisto Mediastinal Benigno": [
+    "Exérese de cisto mediastinal por videotoracoscopia (VATS)",
+    "Exérese de cisto mediastinal robótica",
+    "Exérese de cisto mediastinal por esternotomia / toracotomia",
+  ],
+  "Tumor de Parede Torácica Benigno": [
+    "Ressecção de tumor de parede torácica (com ou sem ressecção costal)",
+    "Ressecção por VATS (lesões selecionadas)",
+  ],
+  "Fibroadenoma de Mama": [
+    "Tumorectomia de mama (exérese de fibroadenoma com margem de segurança)",
+    "Exérese guiada por ultrassom intraoperatório",
+  ],
+  "Tumor Filodes Benigno de Mama": [
+    "Exérese ampla de tumor filodes com margem de 1–2 cm",
+    "Mastectomia simples (tumores volumosos / recorrentes)",
+  ],
+  "Ginecomastia": [
+    "Mastectomia subcutânea bilateral (lipoaspiração + exérese glandular)",
+    "Mastectomia subcutânea bilateral aberta (sem lipoaspiração)",
+  ],
+  "Abscesso Mamário Recorrente / Fístula de Ducto": [
+    "Microdochectomia (exérese do ducto fistuloso)",
+    "Exérese de fístula mamária periareolar",
+    "Ducto-extirpação central (exérese de complexo areolo-papilar e ductos centrais)",
+  ],
+  "Cisto Mamário Volumoso / Recorrente": [
+    "Exérese cirúrgica de cisto mamário",
+    "Punção aspirativa guiada por ultrassom + análise do líquido",
+  ],
+  "Cisto Sebáceo / Epidérmico": [
+    "Exérese de cisto sebáceo / epidérmico em consultório ou centro cirúrgico",
+    "Exérese com cápsula íntegra (técnica de punch — incisão mínima)",
+  ],
+  "Lipoma": [
+    "Exérese de lipoma — ressecção cirúrgica convencional",
+    "Exérese de lipoma — lipoaspiração (lipomas superficiais)",
+  ],
+  "Fibroma / Dermatofibroma": [
+    "Exérese de fibroma / dermatofibroma com margem mínima",
+  ],
+  "Nevo Melanocítico — Exérese Eletiva": [
+    "Exérese de nevo melanocítico com margens de 2–5 mm (nevos benignos)",
+    "Exérese de nevo melanocítico com margens ampliadas (displasia / Breslow > 1 mm)",
+  ],
+  "Queratose Seborreica Complicada": [
+    "Exérese cirúrgica de queratose seborreica",
+    "Eletrocauterização / criocirurgia de queratose seborreica",
+  ],
+  "Granuloma Piogênico": [
+    "Exérese cirúrgica de granuloma piogênico",
+    "Cauterização / eletrocirurgia de granuloma piogênico",
+    "Laser de granuloma piogênico",
+  ],
+  "Carcinoma Basocelular / Espinocelular (ressecção eletiva)": [
+    "Ressecção de carcinoma cutâneo com margens oncológicas (1 cm para CEB / 4–6 mm para CBC)",
+    "Cirurgia de Mohs (carcinoma de alto risco em área de risco / recorrente)",
+    "Ressecção + reconstrução com retalho local",
+    "Ressecção + enxertia de pele",
+  ],
+  "Cirurgia Ambulatorial Dermatológica Geral": [
+    "Exérese de lesão cutânea / subcutânea",
+    "Exérese de lesão cutânea com sutura primária",
+    "Exérese de lesão cutânea com retalho local",
+  ],
+};
+
+const ANAMNESE_POR_MOTIVO = {
+  // ── HÉRNIAS INGUINAIS ──────────────────────────────────────────────────────
+  "Hérnia Inguinal Direita":
+    "Paciente refere aumento de volume em região inguinal direita há [X] meses/anos, com dor e desconforto local que se intensificam aos esforços físicos, tosse, espirros e posição ortostática prolongada. Abaulamento de redução espontânea ao deitar. Nega episódios de encarceramento ou estrangulamento. Sem febre, alterações do hábito intestinal ou sintomas urinários. Solicita avaliação cirúrgica para tratamento definitivo.",
+  "Hérnia Inguinal Esquerda":
+    "Paciente refere aumento de volume em região inguinal esquerda há [X] meses/anos, com dor e desconforto local que se intensificam aos esforços físicos, tosse, espirros e posição ortostática prolongada. Abaulamento de redução espontânea ao deitar. Nega episódios de encarceramento ou estrangulamento. Sem febre, alterações do hábito intestinal ou sintomas urinários. Solicita avaliação cirúrgica para tratamento definitivo.",
+  "Hérnia Inguinal Bilateral":
+    "Paciente refere aumento de volume em ambas as regiões inguinais há [X] meses/anos, com dor e desconforto local bilateral que se intensificam aos esforços, tosse e posição ortostática. Nega encarceramento prévio. Sem febre ou alterações do trânsito intestinal. Solicita avaliação cirúrgica.",
+  "Hérnia Inguinal Direita Recidivada":
+    "Paciente refere recidiva de hérnia inguinal direita após cirurgia prévia realizada em [data/local]. Relata retorno do abaulamento há [X] meses, com desconforto e dor local progressivos. Nega encarceramento. Traz documentação da cirurgia anterior.",
+  "Hérnia Inguinal Esquerda Recidivada":
+    "Paciente refere recidiva de hérnia inguinal esquerda após cirurgia prévia realizada em [data/local]. Relata retorno do abaulamento há [X] meses, com desconforto e dor local progressivos. Nega encarceramento. Traz documentação da cirurgia anterior.",
+  "Hérnia Inguinal Bilateral Recidivada":
+    "Paciente refere recidiva de hérnia inguinal bilateral após cirurgia prévia realizada em [data/local]. Relata retorno de abaulamento bilateral há [X] meses com desconforto progressivo. Nega encarceramento.",
+  // ── HÉRNIAS CRURAIS ───────────────────────────────────────────────────────
+  "Hérnia Crural Direita":
+    "Paciente refere abaulamento em região crural direita há [X] meses, com dor local e sensação de peso. Piora com esforços e posição ortostática. Redutível ao decúbito. Nega encarceramento.",
+  "Hérnia Crural Esquerda":
+    "Paciente refere abaulamento em região crural esquerda há [X] meses, com dor local e sensação de peso. Piora com esforços e posição ortostática. Redutível ao decúbito. Nega encarceramento.",
+  "Hérnia Crural Bilateral":
+    "Paciente refere abaulamento em ambas as regiões crurais há [X] meses, com dor e desconforto bilateral, piora com esforços. Redutível ao decúbito. Nega encarceramento.",
+  // ── HÉRNIAS DA PAREDE ────────────────────────────────────────────────────
+  "Hérnia Umbilical":
+    "Paciente refere aumento de volume em região umbilical há [X] meses/anos, com desconforto e dor local que pioram aos esforços. Abaulamento de redução espontânea ao decúbito. Nega encarceramento prévio. Solicita avaliação para correção cirúrgica eletiva.",
+  "Hérnia Umbilical Recidivada":
+    "Paciente refere recidiva de hérnia umbilical após correção cirúrgica prévia realizada em [data]. Relata retorno do abaulamento umbilical há [X] meses com dor aos esforços. Nega encarceramento.",
+  "Hérnia Epigástrica":
+    "Paciente refere abaulamento em região epigástrica (linha alba) há [X] meses, com dor local intermitente, piora pós-prandial e aos esforços. Redutível ao decúbito. Nega encarceramento.",
+  "Hérnia Incisional":
+    "Paciente refere abaulamento em cicatriz cirúrgica abdominal prévia ([descrever cirurgia/data]) há [X] meses, com dor e sensação de peso progressivos. Aumento do volume ao esforço. Nega encarceramento. Impacto na qualidade de vida e limitação de atividades.",
+  "Hérnia Incisional Recidivada":
+    "Paciente refere nova recidiva de hérnia incisional após múltiplas correções prévias. Abaulamento em região de cicatriz anterior com dor e limitação funcional. Nega encarceramento no momento.",
+  "Hérnia de Spiegel":
+    "Paciente refere dor abdominal em flanco [D/E], sem abaulamento visível evidente, porém com massa palpável ao esforço na região de linha semilunar. Sintomas há [X] meses. Diagnóstico confirmado por ultrassonografia/TC de abdômen.",
+  "Hérnia Lombar":
+    "Paciente refere abaulamento em região lombar [D/E] há [X] meses, com dor local e lombalgia associada. Piora com esforços e posição ortostática. Diagnóstico confirmado por imagem.",
+  "Hérnia Obturadora":
+    "Paciente refere dor em face interna da coxa [D/E], com irradiação para joelho (sinal de Howship-Romberg). Diagnóstico confirmado por TC de pelve. Encaminhada para correção cirúrgica.",
+  "Hérnia Paraesofágica / Hiatal":
+    "Paciente refere pirose, regurgitação e dor retroesternal há [X] meses/anos, com piora ao deitar e após refeições. Episódios de vômitos ocasionais. Diagnóstico de hérnia hiatal confirmado por endoscopia digestiva alta e/ou esofagograma. Sem resposta satisfatória ao tratamento clínico prolongado. Encaminhado para avaliação de correção cirúrgica.",
+  "Diástase dos Retos Abdominais":
+    "Paciente refere abaulamento abdominal central, principalmente ao esforço e à contração muscular, com sensação de fraqueza abdominal e dor lombar associada. Histórico de [gestação(ões)/cirurgias abdominais]. Diagnóstico de diástase dos retos confirmado por exame físico e ultrassonografia de parede abdominal.",
+  // ── VESÍCULA E VIAS BILIARES ─────────────────────────────────────────────
+  "Colelitíase / Colecistite Crônica Calculosa":
+    "Paciente refere episódios recorrentes de dor em hipocôndrio direito e/ou epigástrio, de caráter cólico, com irradiação para dorso e escápula direita, associados à ingestão de alimentos gordurosos. Náuseas e vômitos durante as crises. Diagnóstico de colelitíase confirmado por ultrassonografia abdominal ([X] cálculos, maior medindo [X] mm). Sem icterícia, acolia fecal ou colúria. Nega febre. Indica-se colecistectomia eletiva.",
+  "Colecistite Aguda (eletiva após resolução)":
+    "Paciente com histórico de colecistite aguda tratada conservadoramente em [data], com resolução do quadro inflamatório. Ultrassonografia de controle confirma colelitíase. Encaminhado para colecistectomia eletiva no intervalo de 6–8 semanas.",
+  "Coledocolitíase":
+    "Paciente refere episódios de icterícia obstrutiva, dor em hipocôndrio direito e colúria. Diagnóstico de coledocolitíase confirmado por ultrassonografia/colangioRNM (coledocolitíase com dilatação de vias biliares). Aguarda CPRE para extração do cálculo e colecistectomia laparoscópica em seguida.",
+  "Pólipo de Vesícula Biliar":
+    "Paciente assintomático ou com queixa de desconforto em hipocôndrio direito. Diagnóstico de pólipo de vesícula biliar ao ultrassom (medindo [X] mm). Indicação de colecistectomia por pólipo ≥ 10 mm e/ou crescimento progressivo em exames seriados.",
+  "Colangite Crônica":
+    "Paciente refere episódios recorrentes de febre, icterícia e dor em hipocôndrio direito (tríade de Charcot). Exames de imagem evidenciam colelitíase e espessamento da parede das vias biliares. Indicada colecistectomia com exploração das vias biliares.",
+  // ── ESÔFAGO E ESTÔMAGO ───────────────────────────────────────────────────
+  "Doença do Refluxo Gastroesofágico (DRGE) — Fundoplicatura":
+    "Paciente refere pirose e regurgitação ácida há [X] anos, com piora ao deitar-se, após refeições volumosas e com ingestão de bebidas alcoólicas/café. Relata disfagia ocasional e tosse crônica. Endoscopia digestiva alta evidencia esofagite grau [A–D de Los Angeles]. pH-metria de 24h confirma DRGE. Sem resposta adequada ao tratamento clínico com IBP em dose plena por > 6 meses. Indicado tratamento cirúrgico.",
+  "Acalasia de Esôfago":
+    "Paciente refere disfagia progressiva para sólidos e líquidos há [X] meses/anos, com regurgitação de alimentos não digeridos, dor retroesternal e perda de peso. Diagnóstico confirmado por manometria esofágica de alta resolução (pressão do EEI elevada, aperistalse). Esofagograma com sinal do 'bico de pássaro'. Indicado tratamento cirúrgico ou endoscópico.",
+  "Divertículo de Zenker":
+    "Paciente refere disfagia progressiva, regurgitação de alimentos não digeridos, halitose e episódios de engasgos. Diagnóstico de divertículo de Zenker confirmado por esofagograma baritado. Indica-se tratamento cirúrgico ou endoscópico.",
+  "Úlcera Péptica Gástrica Refratária":
+    "Paciente refere epigastralgia em queimação há [X] anos, sem resposta adequada ao tratamento clínico com IBP e erradicação de H. pylori. Endoscopia digestiva alta confirma úlcera péptica gástrica refratária. Biópsia sem malignidade. Indicado tratamento cirúrgico.",
+  "Úlcera Péptica Duodenal Refratária":
+    "Paciente refere epigastralgia em queimação com melhora com a alimentação há [X] anos. Refratário ao tratamento clínico e erradicação de H. pylori. Endoscopia confirma úlcera duodenal refratária. Indicado tratamento cirúrgico.",
+  // ── CÓLON E RETO ─────────────────────────────────────────────────────────
+  "Doença Diverticular do Cólon Sintomática":
+    "Paciente refere episódios recorrentes de dor em fossa ilíaca esquerda, febre, alterações do hábito intestinal e flatulência. Diagnóstico de doença diverticular do sigmoide confirmado por colonoscopia e/ou TC de abdômen (Hinchey I/II tratados conservadoramente). Indica-se sigmoidectomia eletiva após [X] episódios de diverticulite.",
+  "Megacólon Chagásico":
+    "Paciente refere constipação intestinal crônica grave há [X] anos, com períodos de obstipação prolongada (> 7–10 dias), distensão abdominal e necessidade de laxantes/enemas frequentes. Diagnóstico de megacólon chagásico confirmado por enema opaco e sorologia para Chagas positiva. Indicado tratamento cirúrgico.",
+  "Colite Ulcerativa — Cirurgia Eletiva":
+    "Paciente portador de retocolite ulcerativa há [X] anos, com múltiplos surtos, refratário ao tratamento clínico otimizado (corticoide, mesalazina, imunossupressores, biológicos). Colonoscopia com displasia de alto grau / pancolite refratária. Indicada proctocolectomia total eletiva.",
+  // ── ANORRETAL ────────────────────────────────────────────────────────────
+  "Hemorróidas Grau III / IV":
+    "Paciente refere prolapso hemorroidário recorrente, sangramento retal vivo ao esforço defecatório, dor, prurido e desconforto perianal há [X] meses/anos. Grau III (redução manual necessária) / IV (irredutível). Colonoscopia descartou outras causas de sangramento. Sem resposta satisfatória ao tratamento conservador. Indicado tratamento cirúrgico.",
+  "Fissura Anal Crônica":
+    "Paciente refere dor anal intensa e aguda durante e após a evacuação há [X] meses, associada a sangramento retal vivo escasso e espasmo do esfíncter anal. Diagnóstico de fissura anal crônica confirmado ao exame proctológico (presença de fibra de esfíncter interno). Sem resposta ao tratamento clínico (nitratos, bloqueadores de canal de cálcio tópicos). Indica-se esfincterotomia interna lateral.",
+  "Fístula Perianal (transesfincteriana / supraesfincteriana)":
+    "Paciente refere secreção purulenta crônica em região perianal há [X] meses, com abscesso perianal drenado espontaneamente ou cirurgicamente em [data]. Exame proctológico confirma orifício externo de fístula a [X] cm da borda anal. RM de pelve confirma trajeto fistuloso transesfincteriano. Indicado tratamento cirúrgico.",
+  "Fístula Perianal Baixa (interesfincteriana / submucosa)":
+    "Paciente refere secreção perianal crônica há [X] meses, com antecedente de abscesso perianal. Exame proctológico confirma fístula perianal baixa (interesfincteriana / submucosa). Indica-se fistulotomia eletiva.",
+  "Cisto Pilonidal / Seio Pilonidal":
+    "Paciente refere dor, secreção purulenta e abaulamento em região sacrococcígea há [X] meses, com episódios recorrentes de infecção. Diagnóstico de cisto/seio pilonidal confirmado ao exame físico. Nega episódios febreis no momento. Indica-se exérese eletiva.",
+  "Hemorróidas Grau III / IV":
+    "Paciente refere sangramento retal e prolapso hemorroidário frequentes há [X] meses. Classifica-se como grau III/IV ao exame proctológico. Indica-se tratamento cirúrgico eletivo.",
+  // ── TIREOIDE ─────────────────────────────────────────────────────────────
+  "Bócio Nodular — Tireoidectomia Parcial / Total":
+    "Paciente refere aumento de volume cervical anterior progressivo há [X] meses/anos, com sensação de desconforto cervical, disfagia e/ou disfonia ocasionais. Ultrassonografia tireoidiana evidencia bócio multinodular ([descrever nódulos]). TSH e T4 livre [normais / alterados]. PAAF: Bethesda [II/III/IV]. Indicada tireoidectomia.",
+  "Nódulo de Tireoide Indeterminado (Bethesda III / IV)":
+    "Paciente com nódulo tireoidiano incidental / palpável, sem sintomas compressivos. Ultrassonografia evidencia nódulo em lobo [D/E], medindo [X] mm, com características [descrição]. PAAF: resultado Bethesda [III/IV] — indeterminado/suspeito de neoplasia folicular. TSH normal. Indica-se lobectomia diagnóstico-terapêutica.",
+  "Hipertireoidismo Refratário ao Tratamento Clínico":
+    "Paciente refere perda de peso, tremores, palpitações, intolerância ao calor e nervosismo há [X] meses. Diagnóstico de hipertireoidismo confirmado por TSH suprimido e T4 livre elevado. Cintilografia tireoidiana: [achado]. Sem resposta adequada ao tratamento com tionamidas e/ou radioiodo. Indica-se tireoidectomia total.",
+  "Hiperparatireoidismo Primário — Paratireoidectomia":
+    "Paciente com diagnóstico de hiperparatireoidismo primário confirmado por hipercalcemia persistente e PTH elevado. Cintilografia de paratireoides (MIBI) e/ou ultrassonografia cervical evidenciam adenoma em glândula [descrever]. Sintomas: [nefrolitíase / osteoporose / fadiga / hipercalciúria]. Indica-se paratireoidectomia.",
+  // ── MAMA ─────────────────────────────────────────────────────────────────
+  "Fibroadenoma de Mama":
+    "Paciente refere nódulo palpável em mama [D/E] há [X] meses, sem dor, secreção papilar ou alterações cutâneas. Ultrassonografia mamária confirma nódulo sólido, bem delimitado, com características compatíveis com fibroadenoma (BI-RADS [3/4A]), medindo [X] mm. Core biopsy / PAAF: fibroadenoma. Indica-se exérese eletiva.",
+  "Ginecomastia":
+    "Paciente refere aumento bilateral/unilateral do tecido glandular mamário há [X] meses/anos, com desconforto local e impacto psicossocial. Sem uso de medicamentos causadores de ginecomastia secundária. Exames hormonais sem alterações significativas. Indica-se tratamento cirúrgico.",
+  // ── PARTES MOLES / DERMATOLOGIA ──────────────────────────────────────────
+  "Cisto Sebáceo / Epidérmico":
+    "Paciente refere nódulo subcutâneo em [localização] há [X] meses, indolor, de crescimento lento, com orifício central visível. Episódio de inflamação/infecção prévia em [data]. Nega secreção ativa no momento. Solicita exérese cirúrgica.",
+  "Lipoma":
+    "Paciente refere nódulo subcutâneo em [localização] há [X] meses/anos, de consistência amolecida, indolor, móvel e bem delimitado. Crescimento lento e progressivo. Solicita exérese para alívio sintomático e confirmação diagnóstica.",
+  "Carcinoma Basocelular / Espinocelular (ressecção eletiva)":
+    "Paciente refere lesão cutânea em [localização] há [X] meses, com crescimento progressivo, sangramento ocasional e não cicatrização. Biópsia prévia confirma carcinoma [basocelular / espinocelular]. Sem evidências de metástase. Indica-se ressecção com margens oncológicas.",
+  "Nevo Melanocítico — Exérese Eletiva":
+    "Paciente refere lesão pigmentada em [localização] com alterações recentes (critério ABCDE: [descrever]). Solicita exérese para análise histopatológica e tratamento definitivo.",
+};
+
+const getAnamnese = (motivo, procedimento) => {
+  if (ANAMNESE_POR_MOTIVO[motivo]) return ANAMNESE_POR_MOTIVO[motivo];
+  const proc = procedimento && procedimento !== "__custom__" ? procedimento : "procedimento a definir";
+  return `Paciente encaminhado para avaliação cirúrgica eletiva com diagnóstico de ${motivo}. Relata sintomas compatíveis com a patologia de base há [X] meses/anos, com repercussão na qualidade de vida e limitação de atividades cotidianas. Exames complementares confirmam o diagnóstico. Sem episódios agudos recentes. Indica-se tratamento cirúrgico eletivo: ${proc}.`;
+};
+
 const COMORBIDADES = [
   { id: "has", label: "Hipertensão Arterial Sistêmica (HAS)" },
   { id: "dm", label: "Diabetes Mellitus (DM)" },
@@ -654,6 +1226,7 @@ export default function GeradorLaudo() {
     motivoPersonalizado: "",
     motivoAssociado: "",
     procedimento: "",
+    procedimentoCustom: "",
     anamnese: "",
     exame: "",
     alergias: "",
@@ -715,7 +1288,7 @@ export default function GeradorLaudo() {
   const gerarLaudo = () => {
     const motivo = motivoPrincipalText();
     const associado = (form.motivoAssociado && form.motivoAssociado !== "none") ? `\nMotivo Associado: ${form.motivoAssociado}` : "";
-    const procedimento = form.procedimento || "[procedimento não informado]";
+    const procedimento = (form.procedimento === "__custom__" ? form.procedimentoCustom : form.procedimento) || "[procedimento não informado]";
     const anamnese = form.anamnese || "[anamnese não informada]";
     const exame = form.exame || "[exame físico não informado]";
     const comorbidades = comorbidadesText();
@@ -835,6 +1408,7 @@ CRM-SP 58120`;
       motivoPersonalizado: "",
       motivoAssociado: "",
       procedimento: "",
+      procedimentoCustom: "",
       anamnese: "",
       exame: "",
       alergias: "",
@@ -876,7 +1450,15 @@ CRM-SP 58120`;
                 <Label>Motivo do Encaminhamento Principal *</Label>
                 <Select
                   value={form.motivoPrincipal}
-                  onValueChange={(v) => set("motivoPrincipal", v)}
+                  onValueChange={(v) => {
+                    const opcoes = PROCEDIMENTOS_POR_MOTIVO[v] || [];
+                    setForm((prev) => ({
+                      ...prev,
+                      motivoPrincipal: v,
+                      procedimento: opcoes[0] || prev.procedimento,
+                      procedimentoCustom: "",
+                    }));
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione..." />
@@ -936,13 +1518,46 @@ CRM-SP 58120`;
             </div>
 
             {/* Procedimento */}
-            <div className="space-y-1">
+            <div className="space-y-2">
               <Label>Procedimento Proposto</Label>
-              <Input
-                placeholder="Ex: Herniorrafia inguinal direita com tela (técnica de Lichtenstein)"
-                value={form.procedimento}
-                onChange={(e) => set("procedimento", e.target.value)}
-              />
+              {form.motivoPrincipal && PROCEDIMENTOS_POR_MOTIVO[form.motivoPrincipal] ? (
+                <Select
+                  value={form.procedimento}
+                  onValueChange={(v) => {
+                    set("procedimento", v);
+                    set("procedimentoCustom", "");
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione o procedimento..." />
+                  </SelectTrigger>
+                  <SelectContent className="max-h-72">
+                    {PROCEDIMENTOS_POR_MOTIVO[form.motivoPrincipal].map((p) => (
+                      <SelectItem key={p} value={p}>
+                        {p}
+                      </SelectItem>
+                    ))}
+                    <SelectItem value="__custom__">
+                      ✏️ Digitar procedimento personalizado...
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  placeholder="Ex: Herniorrafia inguinal direita com tela (técnica de Lichtenstein)"
+                  value={form.procedimento}
+                  onChange={(e) => set("procedimento", e.target.value)}
+                />
+              )}
+              {form.procedimento === "__custom__" && (
+                <Input
+                  autoFocus
+                  placeholder="Descreva o procedimento proposto..."
+                  value={form.procedimentoCustom}
+                  onChange={(e) => set("procedimentoCustom", e.target.value)}
+                  className="mt-1"
+                />
+              )}
             </div>
 
             {/* Anamnese */}
