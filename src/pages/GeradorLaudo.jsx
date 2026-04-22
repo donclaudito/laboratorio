@@ -1988,22 +1988,25 @@ Dr. Claudio M Orenstein — CRM-SP 58120`;
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-4 sm:p-8">
-      <div className="max-w-4xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-cyan-700 rounded-2xl p-6 text-white shadow-lg">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <Stethoscope className="w-8 h-8" />
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Gerador de Laudos — Cirurgia Eletiva
-            </h1>
-          </div>
-          <p className="text-center text-sm opacity-90">
-            Preencha os dados do paciente e gere laudos, avaliações e AIH automaticamente.
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+      {/* Header — full width */}
+      <div className="bg-gradient-to-r from-teal-600 to-cyan-700 px-6 py-4 text-white shadow-lg flex items-center gap-3">
+        <Stethoscope className="w-7 h-7 shrink-0" />
+        <div>
+          <h1 className="text-xl font-extrabold tracking-tight leading-tight">
+            Gerador de Laudos — Cirurgia Eletiva
+          </h1>
+          <p className="text-xs opacity-80">
+            Preencha os dados e gere laudos, avaliações e AIH automaticamente.
           </p>
         </div>
+      </div>
 
-        {/* Formulário */}
+      {/* Two-column layout */}
+      <div className="flex flex-col lg:flex-row flex-1 gap-4 p-4 sm:p-6 items-start">
+
+        {/* LEFT — Formulário */}
+        <div className="w-full lg:w-[48%] xl:w-[42%] shrink-0">
         <Card className="shadow-xl">
           <CardHeader className="border-b pb-4">
             <CardTitle className="text-lg text-gray-800 flex items-center gap-2">
@@ -2331,41 +2334,50 @@ Dr. Claudio M Orenstein — CRM-SP 58120`;
             </div>
           </CardContent>
         </Card>
+        </div>
 
-        {/* Outputs */}
-        {outputs && (
-          <div id="outputs-section" className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800 border-b pb-2">
-              Documentos Gerados
-            </h2>
+        {/* RIGHT — Documentos Gerados */}
+        <div className="w-full lg:flex-1 lg:sticky lg:top-4 lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto space-y-4 pb-4">
+          {outputs ? (
+            <>
+              <h2 className="text-lg font-bold text-gray-700 border-b pb-2 sticky top-0 bg-gray-50/90 backdrop-blur-sm z-10 pt-1">
+                Documentos Gerados
+              </h2>
+              <OutputCard
+                icon={FileText}
+                iconColor="text-teal-600"
+                title="Laudo de Consulta Cirúrgica"
+                content={outputs.laudo}
+              />
+              <OutputCard
+                icon={Stethoscope}
+                iconColor="text-purple-600"
+                title="Solicitação Pré-Anestésica"
+                content={outputs.preAnestesica}
+              />
+              <OutputCard
+                icon={Heart}
+                iconColor="text-red-500"
+                title="Avaliação Cardiológica Pré-Operatória"
+                content={outputs.cardiologia}
+              />
+              <OutputCard
+                icon={Wind}
+                iconColor="text-blue-500"
+                title="Avaliação Pneumológica Pré-Operatória"
+                content={outputs.pneumologia}
+              />
+              <AihCard dados={outputs.aihCampos} />
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-64 rounded-2xl border-2 border-dashed border-teal-200 bg-white/60 text-center p-8">
+              <FileText className="w-12 h-12 text-teal-300 mb-3" />
+              <p className="text-gray-500 font-medium">Os documentos gerados aparecerão aqui</p>
+              <p className="text-xs text-gray-400 mt-1">Preencha o formulário e clique em <strong>Gerar Laudo</strong></p>
+            </div>
+          )}
+        </div>
 
-            <OutputCard
-              icon={FileText}
-              iconColor="text-teal-600"
-              title="Laudo de Consulta Cirúrgica"
-              content={outputs.laudo}
-            />
-            <OutputCard
-              icon={Stethoscope}
-              iconColor="text-purple-600"
-              title="Solicitação Pré-Anestésica"
-              content={outputs.preAnestesica}
-            />
-            <OutputCard
-              icon={Heart}
-              iconColor="text-red-500"
-              title="Avaliação Cardiológica Pré-Operatória"
-              content={outputs.cardiologia}
-            />
-            <OutputCard
-              icon={Wind}
-              iconColor="text-blue-500"
-              title="Avaliação Pneumológica Pré-Operatória"
-              content={outputs.pneumologia}
-            />
-            <AihCard dados={outputs.aihCampos} />
-          </div>
-        )}
       </div>
 
       <ModalMedicamentos
