@@ -1703,6 +1703,50 @@ function CopyButton({ text, label }) {
   );
 }
 
+function AihCard({ dados }) {
+  if (!dados) return null;
+  const campos = [
+    { num: 13, label: "PROCEDIMENTO PRINCIPAL SOLICITADO", value: dados.campo13 },
+    { num: 20, label: "PRINCIPAIS SINAIS E SINTOMAS CLÍNICOS", value: dados.campo20 },
+    { num: 21, label: "CONDIÇÕES QUE JUSTIFICAM A INTERNAÇÃO", value: dados.campo21 },
+    { num: 22, label: "DIAGNÓSTICO INICIAL / HIPÓTESE DIAGNÓSTICA", value: dados.campo22 },
+    { num: 23, label: "CID PRINCIPAL (DIAGNÓSTICO DEFINITIVO)", value: dados.campo23 },
+    { num: 24, label: "CID SECUNDÁRIO", value: dados.campo24 },
+    { num: 25, label: "CID CAUSAS ASSOCIADAS / COMORBIDADES", value: dados.campo25 },
+    { num: 26, label: "TIPO DE INTERNAÇÃO", value: dados.campo26 },
+    { num: 27, label: "TIPO DE LEITO", value: dados.campo27 },
+  ];
+  const tudo = campos.map((c) => `${c.num}-${c.label}:\n${c.value}`).join("\n\n");
+  return (
+    <Card className="border border-amber-200 shadow-sm">
+      <CardHeader className="pb-2 pt-4 px-4">
+        <CardTitle className="text-base font-semibold flex items-center justify-between gap-2 text-gray-700">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-amber-600" />
+            Dados para AIH
+          </div>
+          <CopyButton text={tudo} label="Copiar Tudo" />
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="px-4 pb-4 space-y-4">
+        {campos.map(({ num, label, value }) => (
+          <div key={num} className="space-y-1">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-xs font-bold text-amber-700 uppercase tracking-wide">
+                {num} — {label}
+              </p>
+              <CopyButton text={value} label={`Copiar ${num}`} />
+            </div>
+            <div className="rounded border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-800 whitespace-pre-wrap min-h-[36px]">
+              {value}
+            </div>
+          </div>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
 function OutputCard({ icon: Icon, title, content, iconColor }) {
   if (!content) return null;
   return (
@@ -1806,6 +1850,10 @@ export default function GeradorLaudo() {
     const alergias = form.alergias || "Nega";
     const medicacoes = form.medicacoes || "Nega uso de medicações";
     const conduta = form.conduta || "[conduta não informada]";
+    const cid = CID_POR_MOTIVO[form.motivoPrincipal] || "[CID não mapeado]";
+    const cidSecundario = (form.motivoAssociado && form.motivoAssociado !== "none")
+      ? (CID_POR_MOTIVO[form.motivoAssociado] || form.motivoAssociado)
+      : "Não se aplica";
     const imagensText = form.imagensAnexadas.length > 0
       ? form.imagensAnexadas.map((i) => `• ${i}`).join("\n")
       : "Nenhum exame de imagem anexado";
@@ -1898,22 +1946,23 @@ Solicito avaliação do risco respiratório e liberação para cirurgia eletiva.
 
 Dr. Claudio M Orenstein — CRM-SP 58120`;
 
-    const aih = `DADOS PARA AIH — Autorização de Internação Hospitalar
-Data: ${hoje}
+    const sintomasResumido = form.anamnese && form.anamnese.length > 10
+      ? form.anamnese.substring(0, 500)
+      : `Paciente com ${motivo.toLowerCase()}, com indicação de tratamento cirúrgico eletivo.${comorbidades !== "Sem comorbidades conhecidas" ? ` Comorbidades: ${comorbidades}.` : ""}${alergias !== "Nega" ? ` Alergias: ${alergias}.` : ""}`;
 
-Diagnóstico Principal: ${motivo}${associado ? `\nDiagnóstico Secundário: ${associado}` : ""}
-Procedimento Proposto: ${procedimento}
+    const aihCampos = {
+      campo13: procedimento,
+      campo20: sintomasResumido,
+      campo21: `Procedimento cirúrgico eletivo (${procedimento}) indicado para correção de ${motivo} (CID-10: ${cid}), visando o alívio de sintomas e a prevenção de complicações.`,
+      campo22: `${motivo} — CID-10: ${cid}`,
+      campo23: cid,
+      campo24: cidSecundario,
+      campo25: comorbidades,
+      campo26: "02 — Eletiva",
+      campo27: "03 — Cirúrgico",
+    };
 
-Comorbidades: ${comorbidades}
-Medicações: ${medicacoes}
-Alergias: ${alergias}
-
-Conduta: ${conduta}
-
-Médico Solicitante: Dr. Claudio M Orenstein
-CRM-SP 58120`;
-
-    setOutputs({ laudo, preAnestesica, cardiologia, pneumologia, aih });
+    setOutputs({ laudo, preAnestesica, cardiologia, pneumologia, aihCampos });
 
     setTimeout(() => {
       document.getElementById("outputs-section")?.scrollIntoView({ behavior: "smooth" });
@@ -1933,6 +1982,7 @@ CRM-SP 58120`;
       medicacoes: "",
       conduta: "",
       comorbidades: {},
+      imagensAnexadas: [],
     });
     setOutputs(null);
   };
@@ -2313,12 +2363,7 @@ CRM-SP 58120`;
               title="Avaliação Pneumológica Pré-Operatória"
               content={outputs.pneumologia}
             />
-            <OutputCard
-              icon={ClipboardList}
-              iconColor="text-amber-600"
-              title="Dados para AIH"
-              content={outputs.aih}
-            />
+            <AihCard dados={outputs.aihCampos} />
           </div>
         )}
       </div>
