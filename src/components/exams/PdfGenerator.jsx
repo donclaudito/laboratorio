@@ -123,6 +123,8 @@ const isAIFillerLine = (line) => {
   const t = line.trim();
   if (!t) return false;
   if (/^Modelo criado/i.test(t)) return true;
+  if (/^O modelo está salvo/i.test(t)) return true;
+  if (/^Na próxima vez/i.test(t)) return true;
   if (/aqui está o resumo/i.test(t)) return true;
   // Linha curta de metadado "Ícone Modelo: <nome>" (emoji/ícone garbled + Modelo:)
   if (/Modelo:\s*\*{0,2}[^*]+\*{0,2}\s*$/.test(t) && t.length <= 80) return true;
