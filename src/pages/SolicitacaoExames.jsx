@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Copy, Trash2, CheckCircle, Download, Printer } from "lucide-react";
+import { FileText, Copy, Trash2, CheckCircle, Download, Printer, Sparkles, MessageSquare } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
 import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
@@ -12,6 +12,7 @@ import ExamesPreOperatoriosPanel from "../components/exams/ExamesPreOperatoriosP
 import PacienteSelector from "../components/exams/PacienteSelector";
 import ModelosSelector from "../components/exams/ModelosSelector";
 import { gerarPDF, imprimirPDF } from "../components/exams/PdfGenerator";
+import SoleneConversation from "../components/agents/SoleneConversation";
 
 export default function SolicitacaoExames() {
   const [selectedExams, setSelectedExams] = useState({});
@@ -19,6 +20,7 @@ export default function SolicitacaoExames() {
   const [showResult, setShowResult] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
+  const [showSolene, setShowSolene] = useState(false);
 
   // Dados das seções de exames (seções 1-4 tratadas como painéis separados)
   const examSections = [
@@ -273,6 +275,24 @@ export default function SolicitacaoExames() {
             selectedExams={selectedExams}
             onCarregarModelo={setSelectedExams}
           />
+
+          {/* Assistente Solene */}
+          <div className="mb-6">
+            <Button
+              onClick={() => setShowSolene(!showSolene)}
+              variant="outline"
+              className={`w-full justify-start border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-semibold transition-all duration-300 ${showSolene ? "bg-emerald-50" : ""}`}
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              {showSolene ? "Ocultar assistente Solene" : "Conversar com a Solene (assistente de IA)"}
+              <MessageSquare className="w-4 h-4 ml-auto opacity-60" />
+            </Button>
+            {showSolene && (
+              <div className="mt-3 border border-emerald-200 rounded-xl overflow-hidden shadow-md">
+                <SoleneConversation />
+              </div>
+            )}
+          </div>
 
           <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
             Selecione os Exames
