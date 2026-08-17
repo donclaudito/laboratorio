@@ -19,7 +19,7 @@ export function gerarPDF(resultado, paciente = null) {
   const lineHeight = 5.5;
   const footerHeight = 18;
 
-  const lines = resultado.split("\n");
+  const lines = resultado.split("\n").filter((l) => !isAIFillerLine(l));
 
   lines.forEach((line) => {
     // Pular linhas de cabeçalho do markdown que já estão no PDF
@@ -118,6 +118,19 @@ export function gerarPDF(resultado, paciente = null) {
   doc.save(`solicitacao-exames-${hoje.replace(/\//g, "-")}.pdf`);
 }
 
+// Remove linhas de "metadados" da IA (texto introdutório de modelo criado, etc.)
+const isAIFillerLine = (line) => {
+  const t = line.trim();
+  if (!t) return false;
+  if (/^Modelo criado/i.test(t)) return true;
+  if (/aqui está o resumo/i.test(t)) return true;
+  // Linha curta de metadado "Ícone Modelo: <nome>" (emoji/ícone garbled + Modelo:)
+  if (/Modelo:\s*\*{0,2}[^*]+\*{0,2}\s*$/.test(t) && t.length <= 80) return true;
+  // Descrição em itálico puro: *texto* (não confundir com orientações "* **...**")
+  if (/^\*[^*].*\*$/.test(t)) return true;
+  return false;
+};
+
 export function imprimirPDF(resultado, paciente = null) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Reutiliza toda a lógica de geração mas abre janela de impressão
@@ -151,7 +164,7 @@ function gerarPDFBlob(resultado, paciente, doc) {
   addHeader(doc, pageWidth, hoje, paciente);
 
   let y = headerHeight + 10;
-  const lines = resultado.split("\n");
+  const lines = resultado.split("\n").filter((l) => !isAIFillerLine(l));
 
   lines.forEach((line) => {
     if (line.startsWith("# SOLICITAÇÃO") || line.startsWith("**Médico") || line.startsWith("**Data") || line.startsWith("**Paciente")) return;
