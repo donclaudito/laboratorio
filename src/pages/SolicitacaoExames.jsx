@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Copy, Trash2, CheckCircle, Download, Printer, Sparkles, MessageSquare } from "lucide-react";
+import { FileText, Copy, Trash2, CheckCircle, Download, Printer, Sparkles, MessageSquare, FilePlus } from "lucide-react";
 import ExamSection from "../components/exams/ExamSection";
 import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
@@ -21,6 +21,7 @@ export default function SolicitacaoExames() {
   const [copySuccess, setCopySuccess] = useState(false);
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
   const [showSolene, setShowSolene] = useState(false);
+  const [editavel, setEditavel] = useState(false);
 
   // Dados das seções de exames (seções 1-4 tratadas como painéis separados)
   const examSections = [
@@ -229,6 +230,7 @@ export default function SolicitacaoExames() {
     }
 
     setResultado(resultado);
+    setEditavel(false);
     setShowResult(true);
     setTimeout(() => {
       document.getElementById('resultado-area')?.scrollIntoView({ behavior: 'smooth' });
@@ -246,6 +248,21 @@ export default function SolicitacaoExames() {
     setResultado("");
     setShowResult(false);
     setCopySuccess(false);
+    setEditavel(false);
+  };
+
+  const gerarEmBranco = () => {
+    const hoje = new Date().toLocaleDateString('pt-BR');
+    let pacienteInfo = pacienteSelecionado ? `\n**Paciente:** ${pacienteSelecionado.nome}${pacienteSelecionado.idade ? ` | ${pacienteSelecionado.idade} anos` : ""}${pacienteSelecionado.paciente_id ? ` | ID: ${pacienteSelecionado.paciente_id}` : ""}` : "";
+    let resultado = `# SOLICITAÇÃO DE EXAMES\n\n**Médico Solicitante:** Dr Claudio M Orenstein CREMSP 58120\n**Data da Solicitação:** ${hoje}${pacienteInfo}\n\n---\n\n> Cole aqui os exames que deseja solicitar (um por linha).\n\n`;
+    setSelectedExams({});
+    setResultado(resultado);
+    setEditavel(true);
+    setShowResult(true);
+    setCopySuccess(false);
+    setTimeout(() => {
+      document.getElementById('resultado-area')?.scrollIntoView({ behavior: 'smooth' });
+    }, 100);
   };
 
   return (
@@ -375,6 +392,14 @@ export default function SolicitacaoExames() {
               Gerar Solicitação
             </Button>
             <Button
+              onClick={gerarEmBranco}
+              variant="outline"
+              className="border-slate-400 text-slate-700 hover:bg-slate-100 px-6 py-3 font-bold shadow-md transition-all duration-300 hover:scale-105"
+            >
+              <FilePlus className="w-5 h-5 mr-2" />
+              Solicitação em Branco
+            </Button>
+            <Button
               onClick={limparSelecao}
               variant="destructive"
               className="px-6 py-3 font-bold shadow-md transition-all duration-300"
@@ -392,10 +417,16 @@ export default function SolicitacaoExames() {
               </h2>
               <Textarea
                 value={resultado}
-                readOnly
+                readOnly={!editavel}
+                onChange={(e) => setResultado(e.target.value)}
                 rows={15}
-                className="w-full p-4 border border-gray-300 rounded-lg bg-gray-50 text-gray-800 font-mono text-sm shadow-inner"
+                className={`w-full p-4 border border-gray-300 rounded-lg font-mono text-sm shadow-inner ${editavel ? "bg-white" : "bg-gray-50"} text-gray-800`}
               />
+              {editavel && (
+                <p className="text-xs text-emerald-700 mt-1 font-medium">
+                  Modo edição: cole ou digite os exames livres abaixo — o PDF usará este conteúdo.
+                </p>
+              )}
               <div className="flex flex-wrap gap-3 mt-4">
                 <Button
                   onClick={copiarResultado}
