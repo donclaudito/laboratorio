@@ -290,7 +290,19 @@ export default function SolicitacaoExames() {
 
           <ModelosSelector
             selectedExams={selectedExams}
-            onCarregarModelo={setSelectedExams}
+            resultado={resultado}
+            onCarregarModelo={(exames, conteudo) => {
+              setSelectedExams(exames || {});
+              if (conteudo) {
+                setResultado(conteudo);
+                setEditavel(true);
+                setShowResult(true);
+              } else {
+                setResultado("");
+                setEditavel(false);
+                setShowResult(false);
+              }
+            }}
           />
 
           {/* Assistente Solene */}

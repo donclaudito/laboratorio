@@ -6,13 +6,18 @@ import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { BookOpen, Save, Trash2, ChevronDown, ChevronUp, CheckCircle } from "lucide-react";
 
-export default function ModelosSelector({ selectedExams, onCarregarModelo }) {
+export default function ModelosSelector({ selectedExams, resultado, onCarregarModelo }) {
   const [modelos, setModelos] = useState([]);
   const [showList, setShowList] = useState(false);
   const [showSaveForm, setShowSaveForm] = useState(false);
   const [nomeModelo, setNomeModelo] = useState("");
   const [descricaoModelo, setDescricaoModelo] = useState("");
   const [savedFeedback, setSavedFeedback] = useState(false);
+
+  const totalExames = Object.values(selectedExams).reduce((acc, section) => {
+    return acc + Object.values(section).filter(Boolean).length;
+  }, 0);
+  const temConteudo = (resultado || "").trim().length > 0;
 
   const carregar = async () => {
     const lista = await base44.entities.ModeloSolicitacao.list("-created_date", 50);
@@ -23,15 +28,13 @@ export default function ModelosSelector({ selectedExams, onCarregarModelo }) {
 
   const salvarModelo = async () => {
     if (!nomeModelo.trim()) return;
-    const totalExames = Object.values(selectedExams).reduce((acc, section) => {
-      return acc + Object.values(section).filter(Boolean).length;
-    }, 0);
-    if (totalExames === 0) return;
+    if (totalExames === 0 && !temConteudo) return;
 
     await base44.entities.ModeloSolicitacao.create({
       nome: nomeModelo.trim(),
       descricao: descricaoModelo.trim() || undefined,
-      exames: selectedExams
+      exames: totalExames > 0 ? selectedExams : {},
+      conteudo: temConteudo ? resultado : undefined
     });
     setNomeModelo("");
     setDescricaoModelo("");
@@ -89,7 +92,7 @@ export default function ModelosSelector({ selectedExams, onCarregarModelo }) {
       {showSaveForm && (
         <Card className="p-4 mt-3 border-emerald-200 bg-white">
           <p className="text-xs text-gray-500 mb-3">
-            Salva os exames atualmente selecionados como um modelo reutilizável.
+            Salva os exames selecionados e o conteúdo livre atual (se houver) como um modelo reutilizável.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
             <div>
@@ -130,7 +133,7 @@ export default function ModelosSelector({ selectedExams, onCarregarModelo }) {
               {modelos.map(m => (
                 <li
                   key={m.id}
-                  onClick={() => { onCarregarModelo(m.exames); setShowList(false); }}
+                  onClick={() => { onCarregarModelo(m.exames, m.conteudo); setShowList(false); }}
                   className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-emerald-50 transition-colors"
                 >
                   <div>
@@ -138,6 +141,7 @@ export default function ModelosSelector({ selectedExams, onCarregarModelo }) {
                     <p className="text-xs text-gray-400">
                       {m.descricao ? `${m.descricao} · ` : ""}
                       {contarExames(m.exames)} exame{contarExames(m.exames) !== 1 ? "s" : ""}
+                      {m.conteudo ? ` · conteúdo livre` : ""}
                     </p>
                   </div>
                   <button
