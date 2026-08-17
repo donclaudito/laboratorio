@@ -1,6 +1,6 @@
 import { jsPDF } from "jspdf";
 
-export function gerarPDF(resultado, paciente = null) {
+export function gerarPDF(resultado, paciente = null, semRodape = false) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -32,7 +32,7 @@ export function gerarPDF(resultado, paciente = null) {
 
     // Nova página se necessário
     if (y > pageHeight - footerHeight - 10) {
-      addFooter(doc, pageWidth, pageHeight);
+      if (!semRodape) addFooter(doc, pageWidth, pageHeight);
       doc.addPage();
       addHeader(doc, pageWidth, hoje, paciente);
       y = (paciente ? 36 : 26) + 10;
@@ -113,7 +113,7 @@ export function gerarPDF(resultado, paciente = null) {
   });
 
   // ─── RODAPÉ DA ÚLTIMA PÁGINA ─────────────────────────────────────────────
-  addFooter(doc, pageWidth, pageHeight);
+  if (!semRodape) addFooter(doc, pageWidth, pageHeight);
 
   doc.save(`solicitacao-exames-${hoje.replace(/\//g, "-")}.pdf`);
 }
@@ -133,10 +133,10 @@ const isAIFillerLine = (line) => {
   return false;
 };
 
-export function imprimirPDF(resultado, paciente = null) {
+export function imprimirPDF(resultado, paciente = null, semRodape = false) {
   const doc = new jsPDF({ unit: "mm", format: "a4" });
   // Reutiliza toda a lógica de geração mas abre janela de impressão
-  const blob = gerarPDFBlob(resultado, paciente, doc);
+  const blob = gerarPDFBlob(resultado, paciente, doc, semRodape);
   const url = URL.createObjectURL(blob);
   const iframe = document.createElement("iframe");
   iframe.style.display = "none";
@@ -151,7 +151,7 @@ export function imprimirPDF(resultado, paciente = null) {
   };
 }
 
-function gerarPDFBlob(resultado, paciente, doc) {
+function gerarPDFBlob(resultado, paciente, doc, semRodape = false) {
   // Re-run the same rendering logic and return blob
   const pageWidth = doc.internal.pageSize.getWidth();
   const pageHeight = doc.internal.pageSize.getHeight();
@@ -172,7 +172,7 @@ function gerarPDFBlob(resultado, paciente, doc) {
     if (line.startsWith("# SOLICITAÇÃO") || line.startsWith("**Médico") || line.startsWith("**Data") || line.startsWith("**Paciente")) return;
 
     if (y > pageHeight - footerHeight - 10) {
-      addFooter(doc, pageWidth, pageHeight);
+      if (!semRodape) addFooter(doc, pageWidth, pageHeight);
       doc.addPage();
       addHeader(doc, pageWidth, hoje, paciente);
       y = headerHeight + 10;
@@ -235,7 +235,7 @@ function gerarPDFBlob(resultado, paciente, doc) {
     }
   });
 
-  addFooter(doc, pageWidth, pageHeight);
+  if (!semRodape) addFooter(doc, pageWidth, pageHeight);
   return doc.output("blob");
 }
 
