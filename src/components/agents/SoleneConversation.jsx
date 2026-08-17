@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Send, Sparkles, Trash2, Loader2 } from "lucide-react";
+import { Send, Sparkles, Trash2, Loader2, Pencil } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -100,6 +100,23 @@ export default function SoleneConversation() {
     } catch (e) {}
   };
 
+  const renameConversation = async (conv, e) => {
+    e.stopPropagation();
+    const novoNome = window.prompt("Novo nome da conversa:", conv.metadata?.name || "Conversa");
+    if (novoNome === null || !novoNome.trim()) return;
+    try {
+      await base44.agents.updateConversation(conv.id, {
+        metadata: { name: novoNome.trim(), description: conv.metadata?.description || "Conversa com a Solene" },
+      });
+      setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, metadata: { ...c.metadata, name: novoNome.trim() } } : c));
+      if (currentConversation?.id === conv.id) {
+        setCurrentConversation((prev) => prev ? { ...prev, metadata: { ...prev.metadata, name: novoNome.trim() } } : prev);
+      }
+    } catch (e) {
+      alert("Não foi possível renomear a conversa.");
+    }
+  };
+
   const lastAssistantMarkdown = [...messages].reverse().find((m) => m.role === "assistant" && m.content)?.content || "";
 
   const copiarUltimo = () => {
@@ -149,12 +166,22 @@ export default function SoleneConversation() {
                 }`}
               >
                 <span className="truncate">{conv.metadata?.name || "Conversa"}</span>
-                <button
-                  onClick={(e) => deleteConversation(conv.id, e)}
-                  className="opacity-0 group-hover:opacity-100 text-red-400 hover:text-red-600 transition-opacity"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    onClick={(e) => renameConversation(conv, e)}
+                    className="text-emerald-500 hover:text-emerald-700"
+                    title="Renomear"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={(e) => deleteConversation(conv.id, e)}
+                    className="text-red-400 hover:text-red-600"
+                    title="Excluir"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             ))
           )}
