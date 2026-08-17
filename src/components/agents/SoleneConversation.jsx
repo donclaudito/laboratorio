@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { base44 } from "@/api/base44Client";
-import { Send, Sparkles, Trash2, Loader2, Pencil } from "lucide-react";
+import { Send, Sparkles, Trash2, Loader2, Pencil, Check, X } from "lucide-react";
 import MessageBubble from "./MessageBubble";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -17,6 +17,27 @@ export default function SoleneConversation() {
   const [copySuccess, setCopySuccess] = useState(false);
   const messagesEndRef = useRef(null);
   const AGENT_NAME = "solene";
+  const RENAMES_KEY = "solene_renames";
+  const [editingId, setEditingId] = useState(null);
+  const [editingName, setEditingName] = useState("");
+  const editInputRef = useRef(null);
+
+  const [renames, setRenames] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem(RENAMES_KEY) || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  const persistRenames = (next) => {
+    setRenames(next);
+    try {
+      localStorage.setItem(RENAMES_KEY, JSON.stringify(next));
+    } catch {}
+  };
+
+  const displayName = (conv) => renames[conv.id] || conv.metadata?.name || "Conversa";
 
   useEffect(() => {
     loadConversations();
@@ -100,20 +121,27 @@ export default function SoleneConversation() {
     } catch (e) {}
   };
 
-  const renameConversation = async (conv, e) => {
+  const startRename = (conv, e) => {
     e.stopPropagation();
-    const novoNome = window.prompt("Novo nome da conversa:", conv.metadata?.name || "Conversa");
-    if (novoNome === null || !novoNome.trim()) return;
-    try {
-      await base44.agents.updateConversation(conv.id, {
-        metadata: { name: novoNome.trim(), description: conv.metadata?.description || "Conversa com a Solene" },
-      });
-      setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, metadata: { ...c.metadata, name: novoNome.trim() } } : c));
-      if (currentConversation?.id === conv.id) {
-        setCurrentConversation((prev) => prev ? { ...prev, metadata: { ...prev.metadata, name: novoNome.trim() } } : prev);
-      }
-    } catch (e) {
-      alert("Não foi possível renomear a conversa.");
+    setEditingId(conv.id);
+    setEditingName(displayName(conv));
+    setTimeout(() => editInputRef.current?.select(), 0);
+  };
+
+  const cancelRename = () => {
+    setEditingId(null);
+    setEditingName("");
+  };
+
+  const commitRename = (conv) => {
+    const nome = editingName.trim();
+    setEditingId(null);
+    setEditingName("");
+    if (!nome || nome === displayName(conv)) return;
+    persistRenames({ ...renames, [conv.id]: nome });
+    setConversations((prev) => prev.map((c) => c.id === conv.id ? { ...c, metadata: { ...c.metadata, name: nome } } : c));
+    if (currentConversation?.id === conv.id) {
+      setCurrentConversation((prev) => prev ? { ...prev, metadata: { ...prev.metadata, name: nome } } : prev);
     }
   };
 
@@ -165,23 +193,56 @@ export default function SoleneConversation() {
                   currentConversation?.id === conv.id ? "bg-emerald-50 border border-emerald-200" : ""
                 }`}
               >
-                <span className="truncate">{conv.metadata?.name || "Conversa"}</span>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    onClick={(e) => renameConversation(conv, e)}
-                    className="text-emerald-500 hover:text-emerald-700"
-                    title="Renomear"
-                  >
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    onClick={(e) => deleteConversation(conv.id, e)}
-                    className="text-red-400 hover:text-red-600"
-                    title="Excluir"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
+                {editingId === conv.id ? (
+                  <div className="flex items-center gap-1 w-full">
+                    <input
+                      ref={editInputRef}
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") { e.preventDefault(); commitRename(conv); }
+                        if (e.key === "Escape") { e.preventDefault(); cancelRename(); }
+                      }}
+                      className="flex-1 min-w-0 text-sm px-1.5 py-0.5 rounded border border-emerald-300 focus:outline-none focus:ring-1 focus:ring-emerald-400"
+                      placeholder="Nome da conversa"
+                    />
+                    <button
+                      onClick={(e) => { e.stopPropagation(); commitRename(conv); }}
+                      className="text-emerald-600 hover:text-emerald-700"
+                      title="Salvar"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); cancelRename(); }}
+                      className="text-gray-400 hover:text-gray-600"
+                      title="Cancelar"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <span className="truncate">{displayName(conv)}</span>
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        onClick={(e) => startRename(conv, e)}
+                        className="text-emerald-500 hover:text-emerald-700"
+                        title="Renomear"
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={(e) => deleteConversation(conv.id, e)}
+                        className="text-red-400 hover:text-red-600"
+                        title="Excluir"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ))
           )}
