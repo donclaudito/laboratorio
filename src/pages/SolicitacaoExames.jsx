@@ -293,7 +293,7 @@ export default function SolicitacaoExames() {
             resultado={resultado}
             onCarregarModelo={(exames, conteudo) => {
               setSelectedExams(exames || {});
-              if (conteudo) {
+              if (conteudo && conteudo.trim()) {
                 setResultado(conteudo);
                 setEditavel(true);
                 setShowResult(true);
