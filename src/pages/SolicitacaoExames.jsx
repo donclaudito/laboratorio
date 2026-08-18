@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { FileText, Copy, Trash2, CheckCircle, Download, Printer, Sparkles, MessageSquare, FilePlus } from "lucide-react";
+import { FileText, Copy, Trash2, CheckCircle, Download, Printer, Sparkles, MessageSquare, FilePlus, ChevronDown, ChevronRight } from "lucide-react";
+import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible";
 import ExamSection from "../components/exams/ExamSection";
 import ExamesMetabolicosPanel from "../components/exams/ExamesMetabolicosPanel";
 import ExamesRenalHepaticaPanel from "../components/exams/ExamesRenalHepaticaPanel";
@@ -22,6 +23,7 @@ export default function SolicitacaoExames() {
   const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
   const [showSolene, setShowSolene] = useState(false);
   const [editavel, setEditavel] = useState(false);
+  const [examsOpen, setExamsOpen] = useState(true);
 
   // Dados das seções de exames (seções 1-4 tratadas como painéis separados)
   const examSections = [
@@ -323,76 +325,80 @@ export default function SolicitacaoExames() {
             )}
           </div>
 
-          <h2 className="text-xl font-bold mb-4 text-gray-800 border-b pb-2">
-            Selecione os Exames
-          </h2>
+          <Collapsible open={examsOpen} onOpenChange={setExamsOpen} className="mb-2">
+            <CollapsibleTrigger className="flex items-center gap-2 w-full text-left text-xl font-bold mb-4 text-gray-800 border-b pb-2 hover:bg-gray-50 rounded-md transition-colors px-1">
+              {examsOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+              Selecione os Exames
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="space-y-6">
+                {/* Seção Metabólica em 3 colunas */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-700 mb-3">
+                    1. Avaliação Metabólica e Cardiovascular (Sangue)
+                  </h3>
+                  <ExamesMetabolicosPanel
+                    selectedExams={selectedExams["metabolica"] || {}}
+                    onExamChange={handleExamChange}
+                  />
+                </div>
 
-          <div className="space-y-6">
-            {/* Seção Metabólica em 3 colunas */}
-            <div>
-              <h3 className="text-base font-semibold text-gray-700 mb-3">
-                1. Avaliação Metabólica e Cardiovascular (Sangue)
-              </h3>
-              <ExamesMetabolicosPanel
-                selectedExams={selectedExams["metabolica"] || {}}
-                onExamChange={handleExamChange}
-              />
-            </div>
+                {/* Seção Renal/Hepática em 3 colunas */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-700 mb-3">
+                    2. Função Renal, Hepática e Pancreática (Sangue)
+                  </h3>
+                  <ExamesRenalHepaticaPanel
+                    selectedExams={selectedExams["renal_hepatica"] || {}}
+                    onExamChange={handleExamChange}
+                  />
+                </div>
 
-            {/* Seção Renal/Hepática em 3 colunas */}
-            <div>
-              <h3 className="text-base font-semibold text-gray-700 mb-3">
-                2. Função Renal, Hepática e Pancreática (Sangue)
-              </h3>
-              <ExamesRenalHepaticaPanel
-                selectedExams={selectedExams["renal_hepatica"] || {}}
-                onExamChange={handleExamChange}
-              />
-            </div>
+                {/* Seção Geral/Hemato/Hormonal em 3 colunas */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-700 mb-3">
+                    3. Avaliação Geral, Hemato e Hormonal (Sangue)
+                  </h3>
+                  <ExamesGeralHormonalPanel
+                    selectedExams={selectedExams["geral_hormonal"] || {}}
+                    onExamChange={handleExamChange}
+                  />
+                </div>
 
-            {/* Seção Geral/Hemato/Hormonal em 3 colunas */}
-            <div>
-              <h3 className="text-base font-semibold text-gray-700 mb-3">
-                3. Avaliação Geral, Hemato e Hormonal (Sangue)
-              </h3>
-              <ExamesGeralHormonalPanel
-                selectedExams={selectedExams["geral_hormonal"] || {}}
-                onExamChange={handleExamChange}
-              />
-            </div>
+                {/* Seção Urina e Fezes em 3 colunas */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-700 mb-3">
+                    4. Urina e Fezes
+                  </h3>
+                  <ExamesUrinaFezesPanel
+                    selectedExams={selectedExams["urina_fezes"] || {}}
+                    onExamChange={handleExamChange}
+                  />
+                </div>
 
-            {/* Seção Urina e Fezes em 3 colunas */}
-            <div>
-              <h3 className="text-base font-semibold text-gray-700 mb-3">
-                4. Urina e Fezes
-              </h3>
-              <ExamesUrinaFezesPanel
-                selectedExams={selectedExams["urina_fezes"] || {}}
-                onExamChange={handleExamChange}
-              />
-            </div>
+                {/* Seção Pré-Operatórios em 3 colunas */}
+                <div>
+                  <h3 className="text-base font-semibold text-gray-700 mb-3">
+                    5. Pré-Operatórios (Laboratoriais)
+                  </h3>
+                  <ExamesPreOperatoriosPanel
+                    selectedExams={selectedExams["pre_operatorios"] || {}}
+                    onExamChange={handleExamChange}
+                  />
+                </div>
 
-            {/* Seção Pré-Operatórios em 3 colunas */}
-            <div>
-              <h3 className="text-base font-semibold text-gray-700 mb-3">
-                5. Pré-Operatórios (Laboratoriais)
-              </h3>
-              <ExamesPreOperatoriosPanel
-                selectedExams={selectedExams["pre_operatorios"] || {}}
-                onExamChange={handleExamChange}
-              />
-            </div>
-
-            {examSections.map(section => (
-              <ExamSection
-                key={section.id}
-                section={section}
-                selectedExams={selectedExams[section.id] || {}}
-                onExamChange={handleExamChange}
-                onSectionToggle={handleSectionToggle}
-              />
-            ))}
-          </div>
+                {examSections.map(section => (
+                  <ExamSection
+                    key={section.id}
+                    section={section}
+                    selectedExams={selectedExams[section.id] || {}}
+                    onExamChange={handleExamChange}
+                    onSectionToggle={handleSectionToggle}
+                  />
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
 
           {/* Botões de Ação */}
           <div className="flex flex-wrap gap-4 pt-6 border-t border-gray-200 mt-6">
